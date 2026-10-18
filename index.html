@@ -109,7 +109,9 @@
             <div id="menu-group-admin" class="hidden pt-4 mt-4 border-t border-slate-200">
                 <p class="px-3 text-[10px] font-bold text-slate-400 mb-3 uppercase tracking-wider">ส่วนการจัดการ (Admin)</p>
                 <button onclick="switchPage('fin-fund')" id="nav-fin-fund" class="w-full text-left px-4 py-3 rounded-xl text-sm text-slate-600 hover:bg-slate-100 transition flex items-center gap-3"><i class="fas fa-piggy-bank text-lg w-5 text-center"></i> จัดการการเงิน</button>
-                 <button onclick="switchPage('random')" id="nav-random" class="w-full text-left px-4 py-3 rounded-xl text-sm text-slate-600 hover:bg-slate-100 transition flex items-center gap-3"><i class="fas fa-dice text-lg w-5 text-center"></i> สุ่มตัวแทน (Lucky Draw)</button>
+                <!-- 🌟 เพิ่มเมนู รายชื่อ & คะแนนสะสม 🌟 -->
+                <button onclick="switchPage('admin-students'); renderAdminStudentList();" id="nav-admin-students" class="w-full text-left px-4 py-3 rounded-xl text-sm text-slate-600 hover:bg-slate-100 transition flex items-center gap-3"><i class="fas fa-user-graduate text-lg w-5 text-center"></i> รายชื่อ & คะแนนสะสม</button>
+                <button onclick="switchPage('random')" id="nav-random" class="w-full text-left px-4 py-3 rounded-xl text-sm text-slate-600 hover:bg-slate-100 transition flex items-center gap-3"><i class="fas fa-dice text-lg w-5 text-center"></i> สุ่มตัวแทน (Lucky Draw)</button>
                 <button onclick="switchPage('admin-db')" id="nav-admin-db" class="w-full text-left px-4 py-3 rounded-xl text-sm text-slate-600 hover:bg-slate-100 transition flex items-center gap-3"><i class="fas fa-database text-lg w-5 text-center"></i> ฐานข้อมูล นศ.</button>
                 <button onclick="switchPage('admin-users')" id="nav-admin-users" class="w-full text-left px-4 py-3 rounded-xl text-sm text-slate-600 hover:bg-slate-100 transition flex items-center gap-3"><i class="fas fa-users-cog text-lg w-5 text-center"></i> สิทธิ์ผู้ใช้</button>
             </div>
@@ -313,35 +315,81 @@
                 </div>
             </div>
 
-            <div id="page-fin-fund" class="page-view hidden max-w-5xl mx-auto">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                    <div><h2 class="text-2xl font-bold text-slate-800"><i class="fas fa-piggy-bank text-pink-600"></i> จัดการการเงิน</h2></div>
-                    <div class="flex flex-col md:flex-row gap-2 w-full md:w-auto">
-                        <button onclick="openBulkSlipModal()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-indigo-700 transition"><i class="fas fa-magic"></i> โยนสลิป Auto-Match</button>
-                        <button onclick="openDriveSyncModal()" class="bg-sky-600 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-sky-700 transition"><i class="fab fa-google-drive"></i> ดึงสลิปจากโฟลเดอร์ Drive</button>
-                        <button onclick="createFundRoundAlert()" class="bg-pink-600 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-pink-700 transition">+ สร้างรายการใหม่</button>
+<!-- ================= หน้าจัดการการเงิน (ลบส่วนหัว + ย้ายปุ่มสร้างบิลลงกล่อง) ================= -->
+<div id="page-fin-fund" class="page-view hidden px-4 md:px-6 py-4 max-w-6xl mx-auto">
+    
+    <!-- 🌟 เลย์เอาต์หลัก (ลดช่องว่างรอบๆ ให้กระชับขึ้น) -->
+    <div class="flex flex-col gap-4 mb-2">
+        
+        <!-- 🟢 กล่องที่ 1 (บนสุด): ระบบจัดการสลิป + ทวงเงิน -->
+        <div class="bg-white p-4 md:p-5 rounded-3xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+            <h3 class="text-[11px] font-black text-slate-400 mb-3 uppercase tracking-widest border-b border-slate-100/80 pb-2"><i class="fas fa-layer-group mr-1.5"></i> ระบบจัดการสลิป และ แจ้งเตือน</h3>
+            
+            <!-- แถวที่ 1: สลิป -->
+            <div class="grid grid-cols-3 gap-3 mb-3">
+                <button onclick="openAdminDepositUpload()" class="bg-emerald-50/50 hover:bg-emerald-50 border border-emerald-100 text-emerald-700 text-[10px] md:text-xs font-bold py-3 md:py-4 rounded-2xl flex flex-col items-center justify-center gap-1.5 shadow-sm hover:shadow transition-all group">
+                    <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm text-emerald-500 group-hover:scale-110 transition-transform"><i class="fas fa-file-upload text-sm"></i></div>
+                    อัปเงินฝาก
+                </button>
+                <button onclick="openBulkSlipModal()" class="bg-indigo-50/50 hover:bg-indigo-50 border border-indigo-100 text-indigo-700 text-[10px] md:text-xs font-bold py-3 md:py-4 rounded-2xl flex flex-col items-center justify-center gap-1.5 shadow-sm hover:shadow transition-all group">
+                    <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm text-indigo-500 group-hover:scale-110 transition-transform"><i class="fas fa-magic text-sm"></i></div>
+                    Auto-Match
+                </button>
+                <button onclick="openDriveSyncModal()" class="bg-sky-50/50 hover:bg-sky-50 border border-sky-100 text-sky-700 text-[10px] md:text-xs font-bold py-3 md:py-4 rounded-2xl flex flex-col items-center justify-center gap-1.5 shadow-sm hover:shadow transition-all group">
+                    <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm text-sky-500 group-hover:scale-110 transition-transform"><i class="fab fa-google-drive text-sm"></i></div>
+                    ดึงจาก Drive
+                </button>
+            </div>
+
+            <!-- แถวที่ 2: ระบบแจ้งเตือน (ซ่อนไว้ก่อน) -->
+            <div id="admin-reminder-tools" class="hidden grid grid-cols-2 gap-3 pt-2 border-t border-slate-50">
+                <button onclick="triggerEmailAlert()" class="bg-blue-50/50 hover:bg-blue-50 border border-blue-100 text-blue-700 text-xs font-bold py-3 rounded-2xl flex items-center justify-center gap-2 shadow-sm hover:shadow transition-all">
+                    <div class="w-7 h-7 bg-white rounded-full flex items-center justify-center text-blue-500 shadow-sm"><i class="fas fa-envelope text-[10px]"></i></div> ทวงส่วนตัว
+                </button>
+                <button onclick="triggerDueDateEmail()" class="bg-amber-50/50 hover:bg-amber-50 border border-amber-100 text-amber-700 text-xs font-bold py-3 rounded-2xl flex items-center justify-center gap-2 shadow-sm hover:shadow transition-all">
+                    <div class="w-7 h-7 bg-white rounded-full flex items-center justify-center text-amber-500 shadow-sm"><i class="fas fa-clock text-[10px]"></i></div> เตือนวันนี้
+                </button>
+            </div>
+        </div>
+
+        <!-- 🟢 กล่องที่ 2 (ล่างสุด): เลือกบิลที่ต้องการจัดการ -->
+        <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300">
+            <div class="absolute -right-10 -top-10 w-40 h-40 bg-rose-50 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+
+            <div class="flex justify-between items-center mb-4 relative z-10">
+                <label class="text-base font-bold text-slate-700 flex items-center">
+                    <div class="w-8 h-8 bg-rose-100 text-rose-500 rounded-lg flex items-center justify-center mr-2 shadow-inner"><i class="fas fa-file-invoice"></i></div>
+                    เลือกบิลที่ต้องการจัดการ
+                </label>
+                
+                <!-- 🌟 ย้ายปุ่มสร้างบิลมาไว้ตรงนี้ (ตามวงสีม่วง) -->
+                <button onclick="createFundRoundAlert()" class="bg-rose-500 hover:bg-rose-600 text-white px-3 py-1.5 md:px-4 md:py-2 rounded-lg font-bold shadow-sm transition flex items-center gap-1.5 text-xs md:text-sm">
+                    <i class="fas fa-plus-circle"></i> <span class="hidden sm:inline">สร้างบิลใหม่</span>
+                </button>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row gap-3 items-center bg-slate-50/80 p-3 rounded-2xl border border-slate-200/60 relative z-10">
+                <!-- Select -->
+                <div class="relative w-full sm:flex-1">
+                    <select id="fund-round-select" onchange="renderFundTable(); updateQuickToggleBtn();" class="w-full appearance-none bg-white border-2 border-slate-200 text-slate-700 font-bold text-base py-3 px-4 rounded-xl focus:outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-100 transition-all shadow-sm cursor-pointer pr-10"></select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+                        <i class="fas fa-chevron-down text-xs"></i>
                     </div>
                 </div>
-                <div class="bg-white p-4 rounded-xl border border-slate-200 mb-4 shadow-sm flex flex-col md:flex-row items-start md:items-center gap-3">
-                    <label class="font-bold text-sm text-slate-700">เลือกรายการ:</label>
-                    <div class="flex gap-2 w-full md:flex-1">
-    <select id="fund-round-select" onchange="renderFundTable(); updateQuickToggleBtn();" class="flex-1 p-2 border rounded-lg font-bold text-pink-700 outline-none"></select>
-    
-    <!-- เพิ่มปุ่มสวิตช์เปิด-ปิดด่วนตรงนี้ -->
-    <button onclick="toggleQuickRoundStatus()" id="btn-toggle-round" class="hidden px-3 rounded-lg text-sm font-bold shadow-sm transition" title="เปิด/ปิดรอบบิลนี้"></button>
-    
-    <button onclick="editFundRound()" id="btn-edit-round" class="hidden bg-emerald-100 text-emerald-600 px-3 rounded-lg hover:bg-emerald-200 transition" title="แก้ไขรายการ"><i class="fas fa-edit"></i></button>
-    <button onclick="deleteFundRound()" id="btn-del-round" class="hidden bg-rose-100 text-rose-600 px-3 rounded-lg hover:bg-rose-200 transition" title="ลบรายการ"><i class="fas fa-trash"></i></button>
+                
+                <!-- กลุ่มปุ่มจัดการบิลย่อย -->
+                <div class="flex gap-2 w-full sm:w-auto justify-end">
+                    <button onclick="toggleQuickRoundStatus()" id="btn-toggle-round" class="hidden bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-600 w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-sm transition-all" title="เปิด/ปิดรอบบิลนี้"><i class="fas fa-toggle-on text-xl"></i></button>
+                    <button onclick="editFundRound()" id="btn-edit-round" class="hidden bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-600 w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-sm transition-all" title="แก้ไขรายการ"><i class="fas fa-edit text-lg"></i></button>
+                    <button onclick="deleteFundRound()" id="btn-del-round" class="hidden bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-sm transition-all" title="ลบรายการ"><i class="fas fa-trash text-lg"></i></button>
+                </div>
+            </div>
+        </div>
+
+    </div>
 </div>
-                </div>
-                <div id="admin-reminder-tools" class="bg-rose-50 p-4 rounded-xl border border-rose-200 mb-4 shadow-sm flex flex-col md:flex-row items-center gap-3 hidden">
-                    <h4 class="font-bold text-rose-800 text-sm whitespace-nowrap"><i class="fas fa-bullhorn"></i> สั่งการระบบทวงเงิน:</h4>
-                    <div class="flex gap-2 w-full">
-                        <button onclick="triggerEmailAlert()" class="flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg text-xs font-bold shadow hover:bg-blue-700 transition"><i class="fas fa-envelope text-lg align-middle"></i> ส่งอีเมลทวงส่วนตัว</button>
-                        <button onclick="triggerDueDateEmail()" class="flex-1 bg-amber-500 text-white px-3 py-2 rounded-lg text-xs font-bold shadow hover:bg-amber-600 transition"><i class="fas fa-clock text-lg align-middle"></i> เตือนบิลครบกำหนดวันนี้</button>
-                    </div>
-                </div>
-                <div class="bg-white rounded-2xl border shadow-sm">
+<!-- ส่วนกล่องตารางสรุปความคืบหน้าด้านล่างจะต่อขึ้นมาแนบชิด (รักษากล่องเดิมไว้) -->
+    <div class="bg-white rounded-2xl border shadow-sm">
                     <div class="p-4 bg-slate-50 border-b flex flex-wrap justify-between items-center gap-2">
     <h3 class="font-bold text-slate-800">สถานะการชำระเงิน</h3>
     <div class="flex gap-2">
@@ -357,7 +405,35 @@
                     <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="bg-white border-b"><tr><th class="p-3">ชื่อ-สกุล</th><th class="p-3 text-center">สถานะ</th><th class="p-3 text-right">ยอดค้าง</th><th class="p-3 text-center">อัปเดต (Admin)</th></tr></thead><tbody id="fund-list"></tbody></table></div>
                 </div>
             </div>
+<!-- ================= หน้าจัดการรายชื่อและคะแนนนักศึกษา (Admin) ================= -->
+            <div id="page-admin-students" class="page-view hidden max-w-6xl mx-auto">
+                <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm mb-6 flex flex-col md:flex-row gap-3">
+                    <div class="relative flex-1">
+                        <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="admin-search-stu" placeholder="ค้นหาชื่อ หรือ รหัสนักศึกษา..." class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400 transition-colors font-bold text-slate-700" onkeyup="renderAdminStudentList()">
+                    </div>
+                    <select id="admin-filter-room" class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 focus:outline-none focus:border-indigo-400 transition-colors cursor-pointer" onchange="renderAdminStudentList()">
+                        <option value="all">แสดงทุกห้อง</option>
+                    </select>
+                </div>
 
+                <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50/80 text-slate-500 text-[11px] uppercase tracking-widest border-b border-slate-100">
+                                    <th class="p-4 font-black">รหัส - ชื่อสกุล</th>
+                                    <th class="p-4 font-black text-center whitespace-nowrap">ห้อง</th>
+                                    <th class="p-4 font-black text-right whitespace-nowrap">ยอดฝาก</th>
+                                    <th class="p-4 font-black text-center whitespace-nowrap">แต้มสะสม</th>
+                                    <th class="p-4 font-black text-center whitespace-nowrap">จัดการคะแนน</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-student-list-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
            <div id="page-fin-expense" class="page-view hidden max-w-5xl mx-auto">
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex justify-between items-center mb-6 max-w-md">
                     <div><p class="text-xs text-slate-400 font-bold mb-1">งบประมาณส่วนกลาง (Central Fund)</p><h3 id="bal-pool-fund" class="text-2xl font-bold text-emerald-700">฿ 0.00</h3></div>
@@ -430,6 +506,24 @@
                 <label for="toggle-leaderboard" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer transition-all duration-300"></label>
             </div>
         </div>
+        <!-- 🌟 เริ่ม: ตั้งค่าคะแนนอัตโนมัติ (แทรกตรงนี้เลย) -->
+        <h4 class="font-bold text-amber-600 mt-6 mb-3 border-b pb-2"><i class="fas fa-star"></i> ตั้งค่าระบบคะแนนอัตโนมัติ (จุดละกี่คะแนน)</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
+            <div class="bg-amber-50 p-3 rounded-xl border border-amber-200">
+                <label class="text-xs font-bold text-slate-600 mb-1 block">บวกแต้ม: จ่ายเงินกองกลางตรงเวลา (+)</label>
+                <input type="number" id="setting-pts-pay" onchange="updatePointSettings()" class="modern-input mb-0 font-bold text-amber-700" placeholder="เช่น 10">
+            </div>
+            <div class="bg-rose-50 p-3 rounded-xl border border-rose-200">
+                <label class="text-xs font-bold text-slate-600 mb-1 block">หักแต้ม: ค้างชำระเลยกำหนดเวลา (-)</label>
+                <input type="number" id="setting-pts-late" onchange="updatePointSettings()" class="modern-input mb-0 font-bold text-rose-700" placeholder="เช่น 2">
+            </div>
+        </div>
+        <!-- 🌟 จบ: ตั้งค่าคะแนนอัตโนมัติ -->
+        <!-- 🌟 เริ่ม: ตั้งค่าร้านค้า Point Shop -->
+        <h4 class="font-bold text-indigo-600 mt-6 mb-3 border-b pb-2"><i class="fas fa-store"></i> จัดการสินค้าในร้านค้า (Point Shop)</h4>
+        <button onclick="addNewShopItem()" class="mb-3 bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg shadow text-sm font-bold transition">+ สร้างสินค้าใหม่</button>
+        <div id="admin-shop-list" class="grid grid-cols-1 gap-3 mb-4 max-h-64 overflow-y-auto"></div>
+        <!-- 🌟 จบ: ตั้งค่าร้านค้า Point Shop -->
     </div>
                 <div class="bg-white rounded-2xl border shadow-sm">
                     <div class="p-4 bg-slate-50 border-b flex justify-between items-center"><h3 class="font-bold text-slate-800">จัดการสิทธิ์ (Login)</h3><button onclick="addUserAlert()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow">+ สร้าง User</button></div>
@@ -485,7 +579,7 @@
         <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
         <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
     <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwybHq-lR6UjmwQ0ElhCQnCkszkCBBRD9sneLBw9iblLJnhFomJcfJV4HtNrarKJSvu/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbxnf2ikFeHXSxhnNSmy_z4dTgX66P8a6QwrFUZgro6antt7LMyALSdfbTHo_LiwI6Pi/exec";
 
     // 🌟 🌟 🌟 วางโค้ด Firebase ขั้นตอนที่ 2 แทรกตรงนี้ครับ 🌟 🌟 🌟
     const firebaseConfig = {
@@ -829,11 +923,14 @@ function saveToLocal(triggerSync = true) {
         function checkSlipDebtFront(val) {
     let alertDiv = document.getElementById('slip-debt-alert');
     let selectRound = document.getElementById('slip-round');
+    let infoDiv = document.getElementById('slip-student-info'); // 🌟 กล่องโชว์ชื่อ
+    
     if(!alertDiv || !selectRound) return;
     document.getElementById('slip-qr-container').innerHTML = '';
     
     if(!val || val.length < 11) { 
         alertDiv.classList.add('hidden');
+        if(infoDiv) infoDiv.classList.add('hidden'); // ซ่อนชื่อถ้ารหัสไม่ครบ
         selectRound.innerHTML = '<option value="">-- กรุณากรอกรหัสนักศึกษาก่อน --</option>'; 
         return; 
     }
@@ -845,10 +942,19 @@ function saveToLocal(triggerSync = true) {
         alertDiv.className = 'mb-2 p-2 rounded-lg text-xs font-bold text-center bg-slate-100 text-slate-500';
         alertDiv.innerText = 'กำลังค้นหาข้อมูลนักศึกษา...';
         alertDiv.classList.remove('hidden');
+        if(infoDiv) infoDiv.classList.add('hidden'); // ซ่อนชื่อถ้าหาไม่เจอ
         selectRound.innerHTML = '<option value="">-- ไม่พบรหัสนักศึกษาในระบบ --</option>';
         return;
     }
     
+    // 🌟 แสดงกล่องชื่อนักศึกษาเมื่อค้นหาเจอ
+    if(infoDiv) {
+        infoDiv.classList.remove('hidden');
+        document.getElementById('slip-stu-avatar').innerText = getInitials(stu.name);
+        document.getElementById('slip-stu-name').innerText = stu.name;
+        document.getElementById('slip-stu-room').innerText = 'ห้อง ' + (stu.room || 'ไม่ระบุ');
+    }
+
     window.currentStudentRoom = stu.room;
     
     let unpaidRounds = [];
@@ -856,10 +962,9 @@ function saveToLocal(triggerSync = true) {
         if (p.studentId === stu.id) {
             let r = fundRounds.find(rd => rd.id === p.roundId);
             
-            // 🌟 เงื่อนไขที่ปรับปรุงใหม่:
             // 1. ต้องเป็นบิลที่เปิดรับชำระ (isOpen !== false)
             // 2. ต้องมียอดค้าง (r.amt - paid > 0)
-            // 3. **ต้องไม่ใช่บิลที่ส่งสลิปไปแล้วและรอแอดมินยืนยัน**
+            // 3. ต้องไม่ใช่บิลที่ส่งสลิปไปแล้วและรอแอดมินยืนยัน
             if(r && r.isOpen !== false) {
                 let paid = p.paidAmt || 0;
                 let isPending = (p.status === 'รอตรวจสอบ' || p.status === 'รอดำเนินการ');
@@ -1038,6 +1143,17 @@ function openPublicSlipModal(targetRoundId = null) {
             <input id="slip-st-id" class="modern-input mb-2 font-bold text-center tracking-wider" placeholder="เช่น 68152110001-2" oninput="this.value = formatIdSearch(this.value); checkSlipDebtFront(this.value)">
             <button onclick="openQuickScan('slip-st-id')" id="btn-scan-id" class="absolute right-2 top-3 text-slate-400 hover:text-emerald-600"><i class="fas fa-camera text-lg"></i></button>
         </div>
+        
+        <!-- 🌟 เริ่ม: กล่องแสดงชื่อนักศึกษา (จะโผล่มาตอนค้นหาเจอ) -->
+        <div id="slip-student-info" class="hidden mb-2 bg-indigo-50 border border-indigo-100 rounded-xl p-3 flex items-center gap-3 shadow-inner">
+            <div id="slip-stu-avatar" class="w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-sm shrink-0 shadow-sm"></div>
+            <div>
+                <p id="slip-stu-name" class="font-bold text-indigo-900 text-sm leading-tight"></p>
+                <p id="slip-stu-room" class="text-[10px] text-indigo-600 font-bold bg-white px-2 py-0.5 rounded-md border border-indigo-100 mt-1 inline-block"></p>
+            </div>
+        </div>
+        <!-- 🌟 จบ: กล่องแสดงชื่อนักศึกษา -->
+
         <div id="slip-debt-alert" class="hidden mb-2 p-2 rounded-lg text-xs font-bold text-center"></div>
         
         <label class="text-xs font-bold text-slate-500">รายการที่ต้องชำระ (ล็อกบิลเก่าสุด)</label>
@@ -1257,6 +1373,7 @@ function switchPage(pageId) {
     else if (pageId === 'leaderboard') { titleText = 'กระดานผู้นำ (Leaderboard)'; titleIcon = '<i class="fas fa-trophy mr-2 text-amber-500"></i>'; }
     else if (pageId === 'fin-fund') { titleText = 'จัดการการเงิน'; titleIcon = '<i class="fas fa-piggy-bank mr-2 text-rose-500"></i>'; }
     else if (pageId === 'random') { titleText = 'สุ่มตัวแทน (Lucky Draw)'; titleIcon = '<i class="fas fa-dice mr-2 text-rose-500"></i>'; }
+    else if (pageId === 'admin-students') { titleText = 'รายชื่อ & คะแนนสะสม'; titleIcon = '<i class="fas fa-user-graduate mr-2 text-indigo-500"></i>'; }
     else if (pageId === 'admin-db') { titleText = 'ฐานข้อมูล นศ.'; titleIcon = '<i class="fas fa-database mr-2 text-amber-500"></i>'; }
     else if (pageId === 'admin-users') { titleText = 'สิทธิ์ผู้ใช้'; titleIcon = '<i class="fas fa-users-cog mr-2 text-slate-500"></i>'; }
 
@@ -2019,6 +2136,27 @@ function renderHomeDirectory() {
            
            if(navLineLink) navLineLink.classList.remove('hidden'); // แสดงปุ่มที่เมนูซ้าย
        }
+        // 🌟 1. เพิ่มกล่องโชว์คะแนนสะสม และเหรียญตรา (วางก่อน grid.innerHTML)
+       let pointStr = s.points || 0;
+       let badgeHtml = '';
+       if (pointStr >= 500) badgeHtml = '👑 ระดับ: ราชา (VVIP)';
+       else if (pointStr >= 200) badgeHtml = '🥇 ระดับ: ทอง';
+       else if (pointStr >= 50) badgeHtml = '🥈 ระดับ: เงิน';
+       else badgeHtml = '🥉 ระดับ: ผู้เริ่มต้น';
+
+       let pointUi = `
+       <div class="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-5 border border-amber-200 mt-4 flex items-center justify-between shadow-sm">
+           <div class="text-left flex items-center gap-4">
+               <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-amber-500 shadow-sm text-xl shrink-0"><i class="fas fa-star"></i></div>
+               <div>
+                   <p class="text-sm font-bold text-amber-700 mb-0.5">คะแนนสะสม (Points)</p>
+                   <p class="text-[10px] text-amber-600 font-bold">${badgeHtml}</p>
+               </div>
+           </div>
+           <div class="text-right">
+               <p class="text-3xl font-black text-amber-600 tracking-tight">${pointStr}</p>
+           </div>
+       </div>`;
        grid.innerHTML = `
         ${topGreenBar}
         <!-- การ์ดโปรไฟล์หลัก -->
@@ -2037,8 +2175,15 @@ function renderHomeDirectory() {
             
             <!-- นำยอดเงินฝากมาแสดงในการ์ดโปรไฟล์ -->
             ${depositUi}
+            
+            <!-- 🌟 นำคะแนนมาแสดงต่อท้ายยอดเงินฝาก -->
+            ${pointUi}
+            <!-- 🌟 ปุ่มกดเข้าร้านค้า Point Shop -->
+            <button onclick="openPointShop('${s.id}')" class="w-full mt-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-md transition transform hover:scale-[1.02]">
+                <i class="fas fa-store mr-2"></i> เข้าสู่ร้านค้า (Point Shop)
+            </button>
         </div>
-        // ... โค้ดส่วนล่างเหมือนเดิม
+
         
         <!-- ยอดค้างชำระ -->
         ${notificationCard}
@@ -3472,12 +3617,20 @@ window.confirmScan = function(stuId, title) {
     // 🌟 ถ้านักศึกษาเคยจองรอบไหนมา ให้ใช้รอบนั้นเลย ถ้าไม่เคยจอง (Walk-in) ให้ยัดเข้ารอบแรกอัตโนมัติ
     let roundName = (existingLog && existingLog.roundName) ? existingLog.roundName : defaultRound;
     
+    let actPoints = act ? (parseInt(act.points) || 0) : 0; 
+    
     if (mode === 'in') { // สแกนเข้า
         if (existingLog) {
+            if (existingLog.timeIn === 'จองสิทธิ์ล่วงหน้า' || existingLog.timeIn === '-') {
+                stu.points = (stu.points || 0) + actPoints;
+                if (actPoints > 0) txHistory.unshift({ date: timeStr, name: `+${actPoints} แต้ม (เข้าร่วมกิจกรรม ${title})`, type: 'ระบบ', amt: 0, user: currentUsername });
+            }
             existingLog.timeIn = timeStr;
             existingLog.roundName = roundName; 
         } else {
             activityLogs.unshift({ studentId: stu.id, activityTitle: title, roundName: roundName, timeIn: timeStr, timeOut: null });
+            stu.points = (stu.points || 0) + actPoints;
+            if (actPoints > 0) txHistory.unshift({ date: timeStr, name: `+${actPoints} แต้ม (เข้าร่วมกิจกรรม ${title})`, type: 'ระบบ', amt: 0, user: currentUsername });
         }
     } else { // สแกนออก
         if (existingLog) {
@@ -3546,7 +3699,11 @@ function keepInputFocused(e) {
             let act = appSettings.activities.find(a => a.title === title); let participants = activityLogs.filter(l => l.activityTitle === title);
             if (act && act.maxParticipants > 0 && participants.length >= act.maxParticipants) return Swal.fire('คิวเต็ม!', `กิจกรรมนี้รับครบ ${act.maxParticipants} คนแล้วครับ`, 'error');
             let existing = activityLogs.find(l => l.studentId === stu.id && l.activityTitle === title); if(existing) return Swal.fire('ซ้ำ', 'นักศึกษาคนนี้ลงทะเบียนไปแล้วครับ', 'warning');
-            activityLogs.unshift({ studentId: stu.id, activityTitle: title, timeIn: getNow(), timeOut: null }); txHistory.unshift({ date: getNow(), name: 'เพิ่มชื่อด้วยมือ (' + title + '): ' + stu.name, type: 'ระบบ', amt: 0, user: currentUsername });
+            let actPoints = act ? (parseInt(act.points) || 0) : 0;
+            activityLogs.unshift({ studentId: stu.id, activityTitle: title, timeIn: getNow(), timeOut: null }); 
+            stu.points = (stu.points || 0) + actPoints;
+            if (actPoints > 0) txHistory.unshift({ date: getNow(), name: `+${actPoints} แต้ม (เข้าร่วมกิจกรรม ${title})`, type: 'ระบบ', amt: 0, user: currentUsername });
+            txHistory.unshift({ date: getNow(), name: 'เพิ่มชื่อด้วยมือ (' + title + '): ' + stu.name, type: 'ระบบ', amt: 0, user: currentUsername });
             saveToLocal(); inputEl.value = ''; openActivityDashboard(title); Swal.fire({toast: true, position: 'top-end', icon: 'success', title: 'เพิ่มรายชื่อสำเร็จ', showConfirmButton: false, timer: 1500});
         }
 
@@ -4047,7 +4204,7 @@ function viewSlipPopup(url) {
     }
     const roundInfo = fundRounds.find(r => r.id === roundId); 
 
-    // 🌟 1. คัดกรองห้องแบบเข้มงวด (ถ้าชื่อบิลคือ A ห้อง B จะหายไปทันที)
+    // 🌟 1. คัดกรองห้องแบบเข้มงวด
     let allRooms = [...new Set(students.map(s => s.room || 'ไม่ระบุห้อง'))];
     let targetRooms = [];
     
@@ -4055,7 +4212,6 @@ function viewSlipPopup(url) {
     if (selectedRoom && selectedRoom !== 'all' && selectedRoom !== 'ทุกห้อง') {
         targetRooms = allRooms.filter(r => selectedRoom.includes(r));
     } else {
-        // ใช้ AI ดึงเฉพาะตัวอักษรของห้อง (เช่น เอาแค่ "a" มาเทียบกับชื่อบิล)
         targetRooms = allRooms.filter(r => {
             let roomCode = r.toLowerCase().replace(/fn|ปวส|ปวช|สค|ห้อง|\s/ig, ''); 
             let titleStr = roundInfo.title.toLowerCase().replace(/\s/g, ''); 
@@ -4096,7 +4252,6 @@ function viewSlipPopup(url) {
         summaryHtml += `
         <div class="bg-white p-4 rounded-xl border ${isComplete ? 'border-emerald-300 bg-emerald-50/30' : 'border-slate-200'} shadow-sm flex flex-col md:flex-row items-center gap-4 mb-3 transition-all hover:shadow-md">
             
-            <!-- ไอคอน และ ชื่อห้อง -->
             <div class="flex-shrink-0 w-full md:w-40 flex items-center gap-3">
                 <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold ${isComplete ? 'bg-emerald-100 text-emerald-600' : 'bg-blue-100 text-blue-600'}">
                     <i class="fas ${isComplete ? 'fa-check' : 'fa-users'}"></i>
@@ -4107,7 +4262,6 @@ function viewSlipPopup(url) {
                 </div>
             </div>
             
-            <!-- หลอดความคืบหน้าแบบยาว -->
             <div class="flex-grow w-full">
                 <div class="flex justify-between text-xs mb-1.5">
                     <span class="font-bold ${isComplete ? 'text-emerald-600' : 'text-blue-600'}">ยอดจัดเก็บ ฿${stat.current.toLocaleString('th-TH')}</span>
@@ -4118,21 +4272,19 @@ function viewSlipPopup(url) {
                 </div>
             </div>
             
-            <!-- ตัวเลขเปอร์เซ็นต์ด้านขวาสุด -->
             <div class="flex-shrink-0 w-full md:w-16 text-right md:text-center mt-2 md:mt-0">
                 <span class="font-bold text-lg ${isComplete ? 'text-emerald-600' : 'text-slate-700'}">${pct}%</span>
             </div>
         </div>`;
     }
 
-    // อัปเดตกล่องสรุป
     summaryDiv.innerHTML = `
     <div class="mb-2 px-1">
         <h3 class="text-sm font-bold text-slate-700 flex items-center gap-2 mb-3"><i class="fas fa-chart-bar text-blue-500"></i> สรุปความคืบหน้า: ${roundInfo.title}</h3>
         ${summaryHtml}
     </div>`;
 
-    // 🌟 4. โหลดรายชื่อเด็กลงตาราง (โดยตัด `<tr>` สรุปของเก่าออกแล้ว)
+    // 🌟 4. โหลดรายชื่อเด็กลงตาราง
     let filteredStudents = targetStudents.filter(s => {
         let matchName = s.name.toLowerCase().includes(search) || s.room.toLowerCase().includes(search);
         if (!matchName) return false;
@@ -4168,133 +4320,161 @@ function viewSlipPopup(url) {
             let lockBtn = ''; if (!isFull) { let isUn = payment.qrUnlocked; lockBtn = `<button onclick="toggleQrLock(${roundId}, '${s.id}')" class="${isUn ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-400'} px-2 py-1.5 rounded text-[10px] font-bold hover:bg-slate-200 transition shadow-sm" title="${isUn ? 'ปลดล็อกให้แล้ว' : 'ล็อกยอดเป๊ะอยู่'}"><i class="fas fa-${isUn ? 'unlock' : 'lock'}"></i></button>`; }
             
             let btnEdit = `<button onclick="editPaymentStatus(${roundId}, '${s.id}')" class="bg-slate-100 text-slate-500 px-2 py-1.5 rounded text-xs font-bold hover:bg-slate-200 transition shadow-sm" title="แก้ไขสถานะ/ยอดเงิน"><i class="fas fa-cog"></i></button>`;
-            actionHtml = `<div class="flex flex-wrap gap-1 justify-center items-center min-w-[140px]">${btnView}${btnApprove}${btnReceipt}${lockBtn}${btnEdit}</div>`;
+            
+            // 🌟 5. เพิ่มปุ่ม "หักฝาก" เข้าไปในกลุ่ม actionHtml
+            let btnPayWithDeposit = '';
+            if (!isFull && s.dep > 0) {
+                btnPayWithDeposit = `<button onclick="payWithDeposit('${s.id}', ${roundId})" class="bg-[#10b981] hover:bg-[#059669] text-white px-2 py-1.5 rounded text-[10px] font-bold shadow-sm transition" title="หักยอดฝากจ่ายบิลนี้"><i class="fas fa-wallet mr-1"></i>หักฝาก</button>`;
+            }
+
+            actionHtml = `<div class="flex flex-wrap gap-1 justify-center items-center min-w-[140px]">${btnView}${btnApprove}${btnPayWithDeposit}${btnReceipt}${lockBtn}${btnEdit}</div>`;
         }
         
-        fHtml += `<tr class="border-b hover:bg-slate-50 transition"><td class="p-3 whitespace-nowrap min-w-[150px]"><b>${s.name}</b><br><span class="text-[10px] text-slate-400 font-mono">${s.id}</span></td><td class="p-3 text-center w-32 min-w-[120px]"><span class="${badgeClass} px-2 py-1 rounded text-[10px] font-bold inline-block">${displayStatus}</span>${progHtml}</td><td class="p-3 text-right font-bold min-w-[80px] ${remain>0?'text-rose-500':'text-slate-300'}">฿${remain.toFixed(2)}</td><td class="p-3 text-center">${actionHtml}</td></tr>`;
+        // 🌟 6. แก้ไขคอลัมน์ชื่อ เพื่อแสดง Popup ข้อมูลการเงินรายบุคคล และป้ายบอกยอดเงินฝาก
+        let nameColHtml = `
+            <div class="flex flex-col">
+                <span class="font-bold text-slate-700 text-sm cursor-pointer hover:text-indigo-600 transition" onclick="viewStudentFinance('${s.id}')">
+                    ${s.name} <i class="fas fa-search text-[10px] text-slate-400 ml-1"></i>
+                </span>
+                <span class="text-[10px] text-slate-400 font-mono mt-0.5">${s.id}</span>`;
+                
+        if (s.dep > 0) {
+            nameColHtml += `<div class="mt-1"><span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 inline-block"><i class="fas fa-wallet mr-1"></i>เงินฝาก ฿${(s.dep).toFixed(2)}</span></div>`;
+        }
+        nameColHtml += `</div>`;
+
+        fHtml += `<tr class="border-b hover:bg-slate-50 transition"><td class="p-3 whitespace-nowrap min-w-[150px]">${nameColHtml}</td><td class="p-3 text-center w-32 min-w-[120px]"><span class="${badgeClass} px-2 py-1 rounded text-[10px] font-bold inline-block">${displayStatus}</span>${progHtml}</td><td class="p-3 text-right font-bold min-w-[80px] ${remain>0?'text-rose-500':'text-slate-300'}">฿${remain.toFixed(2)}</td><td class="p-3 text-center">${actionHtml}</td></tr>`;
     });
     
     listEl.innerHTML = fHtml;
 }
 
         function approveFundPayment(roundId, studentId, maxRemain, isCash = false) {
-            let stu = students.find(s => s.id == studentId);
-            let round = fundRounds.find(rd => rd.id == roundId);
+    let stu = students.find(s => s.id == studentId);
+    let round = fundRounds.find(rd => rd.id == roundId);
+    let currentPayment = fundPayments.find(p => p.roundId == roundId && p.studentId == studentId);
             
-            // 1. ค้นหาหนี้เก่าที่ค้างอยู่ (บิลอื่นๆ ที่ไม่ใช่บิลนี้)
-            let otherUnpaidRounds = [];
-            let totalOtherDebt = 0;
+    // 1. ค้นหาหนี้เก่าที่ค้างอยู่ (บิลอื่นๆ ที่ไม่ใช่บิลนี้)
+    let otherUnpaidRounds = [];
+    let totalOtherDebt = 0;
             
-            fundPayments.forEach(p => {
-                //🌟 เพิ่มการดึงบิลที่ขึ้น 'รอตรวจสอบ' หรือ 'รอดำเนินการ' มารวมด้วย เผื่อกรณีที่เพื่อนเหมาจ่ายมา
-                if (p.studentId === studentId && p.roundId != roundId && 
-                   (p.status === 'ยังไม่ชำระ' || p.status.includes('ค้างชำระ') || p.status === 'ตีกลับ' || p.status === 'รอตรวจสอบ' || p.status === 'รอดำเนินการ')) {
-                    let r = fundRounds.find(rd => rd.id === p.roundId);
-                    if (r && r.isOpen !== false) {
-                        let remain = r.amt - (p.paidAmt || 0);
-                        if (remain > 0) {
-                            otherUnpaidRounds.push({ payment: p, round: r, remain: remain });
-                            totalOtherDebt += remain;
-                        }
-                    }
+    fundPayments.forEach(p => {
+        //🌟 เพิ่มการดึงบิลที่ขึ้น 'รอตรวจสอบ' หรือ 'รอดำเนินการ' มารวมด้วย เผื่อกรณีที่เพื่อนเหมาจ่ายมา
+        if (p.studentId === studentId && p.roundId != roundId && 
+           (p.status === 'ยังไม่ชำระ' || p.status.includes('ค้างชำระ') || p.status === 'ตีกลับ' || p.status === 'รอตรวจสอบ' || p.status === 'รอดำเนินการ')) {
+            let r = fundRounds.find(rd => rd.id === p.roundId);
+            if (r && r.isOpen !== false) {
+                let remain = r.amt - (p.paidAmt || 0);
+                if (remain > 0) {
+                    otherUnpaidRounds.push({ payment: p, round: r, remain: remain });
+                    totalOtherDebt += remain;
                 }
-            });
-
-            // เรียงลำดับหนี้จากเก่าไปใหม่ (อิงจากวันที่สร้างบิล)
-            otherUnpaidRounds.sort((a, b) => new Date(a.round.dueDate || '9999-12-31') - new Date(b.round.dueDate || '9999-12-31'));
-
-            // 2. สร้างกล่องแจ้งเตือนถ้ามีหนี้เก่า
-            let debtAlertHtml = '';
-            if (totalOtherDebt > 0) {
-                debtAlertHtml = `<div class="mt-4 p-3 bg-rose-50 border border-rose-200 rounded-lg text-rose-700 text-xs text-left shadow-inner">
-                    <p class="font-bold text-sm mb-1"><i class="fas fa-exclamation-circle"></i> แจ้งเตือน: มียอดค้างชำระบิลอื่น!</p>
-                    <p>เพื่อนคนนี้มียอดค้างบิลเก่ารวม <b>฿${totalOtherDebt.toFixed(2)}</b><br>
-                    <span class="text-rose-500">*ถ้าระบุเงินเกินบิลนี้ ระบบจะนำเงินส่วนเกินไปหักหนี้เก่าให้อัตโนมัติ หากมีเงินทอนเหลือจะเก็บเข้ายอดฝาก</span></p>
-                </div>`;
             }
+        }
+    });
 
-            let cashTitle = isCash ? '(รับเงินสด)' : '(รับเงินโอน)';
+    // เรียงลำดับหนี้จากเก่าไปใหม่ (อิงจากวันที่สร้างบิล)
+    otherUnpaidRounds.sort((a, b) => new Date(a.round.dueDate || '9999-12-31') - new Date(b.round.dueDate || '9999-12-31'));
+
+    // 2. สร้างกล่องแจ้งเตือนถ้ามีหนี้เก่า
+    let debtAlertHtml = '';
+    if (totalOtherDebt > 0) {
+        debtAlertHtml = `<div class="mt-4 p-3 bg-rose-50 border border-rose-200 rounded-lg text-rose-700 text-xs text-left shadow-inner">
+            <p class="font-bold text-sm mb-1"><i class="fas fa-exclamation-circle"></i> แจ้งเตือน: มียอดค้างชำระบิลอื่น!</p>
+            <p>เพื่อนคนนี้มียอดค้างบิลเก่ารวม <b>฿${totalOtherDebt.toFixed(2)}</b><br>
+            <span class="text-rose-500">*ถ้าระบุเงินเกินบิลนี้ ระบบจะนำเงินส่วนเกินไปหักหนี้เก่าให้อัตโนมัติ หากมีเงินทอนเหลือจะเก็บเข้ายอดฝาก</span></p>
+        </div>`;
+    }
+
+    let cashTitle = isCash ? '(รับเงินสด)' : '(รับเงินโอน)';
             
-            Swal.fire({ 
-                title: `บันทึกรับเงิน ${cashTitle}`, 
-                html: `<div class="text-left bg-slate-50 p-4 rounded-xl border border-slate-200">
-                           <div class="flex justify-between items-center border-b pb-2 mb-3 text-sm">
-                               <span class="font-bold text-slate-600">ยอดบิลนี้ (${round.title})</span>
-                               <span class="font-bold text-blue-600">฿${maxRemain.toFixed(2)}</span>
-                           </div>
-                           <label class="text-xs font-bold text-slate-500 mb-2 block">ระบุยอดเงินที่ได้รับมาจริงทั้งหมด (บาท)</label>
-                           <input type="number" id="pay-amt-input" class="modern-input text-3xl font-bold text-emerald-600 text-center py-4" value="${maxRemain}" min="1">
-                           ${debtAlertHtml}
-                       </div>`, 
-                showCancelButton: true, confirmButtonText: 'ถัดไป <i class="fas fa-arrow-right"></i>', confirmButtonColor: '#10b981', cancelButtonText: 'ยกเลิก', 
-                preConfirm: () => { 
-                    let amt = parseFloat(document.getElementById('pay-amt-input').value); 
-                    if(!amt || amt <= 0) return Swal.showValidationMessage('กรุณาระบุจำนวนเงินที่ถูกต้อง'); 
-                    return amt; 
-                } 
-            }).then(r => {
-                if(r.isConfirmed) {
-                    let totalReceived = r.value;
-                    let currentBillPay = Math.min(totalReceived, maxRemain);
-                    let excess = totalReceived - currentBillPay;
+    Swal.fire({ 
+        title: `บันทึกรับเงิน ${cashTitle}`, 
+        html: `<div class="text-left bg-slate-50 p-4 rounded-xl border border-slate-200">
+                   <div class="flex justify-between items-center border-b pb-2 mb-3 text-sm">
+                       <span class="font-bold text-slate-600">ยอดบิลนี้ (${round.title})</span>
+                       <span class="font-bold text-blue-600">฿${maxRemain.toFixed(2)}</span>
+                   </div>
+                   <label class="text-xs font-bold text-slate-500 mb-2 block">ระบุยอดเงินที่ได้รับมาจริงทั้งหมด (บาท)</label>
+                   <input type="number" id="pay-amt-input" class="modern-input text-3xl font-bold text-emerald-600 text-center py-4" value="${maxRemain}" min="1">
+                   ${debtAlertHtml}
+               </div>`, 
+        showCancelButton: true, confirmButtonText: 'ถัดไป <i class="fas fa-arrow-right"></i>', confirmButtonColor: '#10b981', cancelButtonText: 'ยกเลิก', 
+        preConfirm: () => { 
+            let amt = parseFloat(document.getElementById('pay-amt-input').value); 
+            if(!amt || amt <= 0) return Swal.showValidationMessage('กรุณาระบุจำนวนเงินที่ถูกต้อง'); 
+            return amt; 
+        } 
+    }).then(r => {
+        if(r.isConfirmed) {
+            let totalReceived = r.value;
+            let currentBillPay = Math.min(totalReceived, maxRemain);
+            let excess = totalReceived - currentBillPay;
                     
-                    let summaryHtml = `<div class="text-left text-sm space-y-3">
-                        <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 flex justify-between">
-                            <span>จ่ายบิลนี้ (${round.title})</span>
-                            <span class="font-bold text-blue-700">฿${currentBillPay.toFixed(2)}</span>
-                        </div>`;
+            let summaryHtml = `<div class="text-left text-sm space-y-3">
+                <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 flex justify-between">
+                    <span>จ่ายบิลนี้ (${round.title})</span>
+                    <span class="font-bold text-blue-700">฿${currentBillPay.toFixed(2)}</span>
+                </div>`;
                     
-                    let remainingExcess = excess;
-                    let otherPaymentsToUpdate = [];
+            let remainingExcess = excess;
+            let otherPaymentsToUpdate = [];
                     
-                    // กระจายเงินส่วนเกินไปโปะหนี้เก่า
-                    if (remainingExcess > 0 && otherUnpaidRounds.length > 0) {
-                        summaryHtml += `<div class="bg-rose-50 p-3 rounded-lg border border-rose-100">
+            // กระจายเงินส่วนเกินไปโปะหนี้เก่า
+            if (remainingExcess > 0 && otherUnpaidRounds.length > 0) {
+                summaryHtml += `<div class="bg-rose-50 p-3 rounded-lg border border-rose-100">
                                             <p class="font-bold text-rose-600 border-b border-rose-200 pb-1 mb-2">นำส่วนเกินหักหนี้เก่า:</p>`;
                         
-                        otherUnpaidRounds.forEach(item => {
-                            if (remainingExcess > 0) {
-                                let payThisDebt = Math.min(remainingExcess, item.remain);
-                                remainingExcess -= payThisDebt;
-                                otherPaymentsToUpdate.push({ payment: item.payment, round: item.round, payAmt: payThisDebt });
-                                summaryHtml += `<div class="flex justify-between text-xs mb-1 pl-2">
-                                                    <span class="text-rose-700">- ${item.round.title}</span>
-                                                    <span class="font-bold text-rose-600">฿${payThisDebt.toFixed(2)}</span>
-                                                </div>`;
-                            }
-                        });
-                        summaryHtml += `</div>`;
+                otherUnpaidRounds.forEach(item => {
+                    if (remainingExcess > 0) {
+                        let payThisDebt = Math.min(remainingExcess, item.remain);
+                        remainingExcess -= payThisDebt;
+                        otherPaymentsToUpdate.push({ payment: item.payment, round: item.round, payAmt: payThisDebt });
+                        summaryHtml += `<div class="flex justify-between text-xs mb-1 pl-2">
+                                                            <span class="text-rose-700">- ${item.round.title}</span>
+                                                            <span class="font-bold text-rose-600">฿${payThisDebt.toFixed(2)}</span>
+                                                        </div>`;
                     }
+                });
+                summaryHtml += `</div>`;
+            }
                     
-                    // เงินที่เหลือไปยอดฝาก
-                    let depositAdd = remainingExcess;
-                    if (depositAdd > 0) {
-                        summaryHtml += `<div class="bg-emerald-50 p-3 rounded-lg border border-emerald-100 flex justify-between">
+            // เงินที่เหลือไปยอดฝาก
+            let depositAdd = remainingExcess;
+            if (depositAdd > 0) {
+                summaryHtml += `<div class="bg-emerald-50 p-3 rounded-lg border border-emerald-100 flex justify-between">
                                             <span class="text-emerald-700">เงินทอนเก็บเข้า "ยอดฝาก"</span>
                                             <span class="font-bold text-emerald-600">+ ฿${depositAdd.toFixed(2)}</span>
                                         </div>`;
-                    }
+            }
 
-                    summaryHtml += `</div>`;
+            summaryHtml += `</div>`;
 
-                    // เด้งหน้าต่างสรุปผลให้เหรัญญิกกดยืนยัน
-                    Swal.fire({
-                        title: 'สรุปการจัดสรรเงิน',
-                        html: summaryHtml,
-                        showCancelButton: true,
-                        confirmButtonText: '✅ ยืนยันตามนี้',
-                        confirmButtonColor: '#059669',
-                        cancelButtonText: 'ยกเลิก'
-                    }).then(confirmRes => {
-                        if (confirmRes.isConfirmed) {
+            // เด้งหน้าต่างสรุปผลให้เหรัญญิกกดยืนยัน
+            Swal.fire({
+                title: 'สรุปการจัดสรรเงิน',
+                html: summaryHtml,
+                showCancelButton: true,
+                confirmButtonText: '✅ ยืนยันตามนี้',
+                confirmButtonColor: '#059669',
+                cancelButtonText: 'ยกเลิก'
+            }).then(confirmRes => {
+                if (confirmRes.isConfirmed) {
                             
-                            // 1. ตัดบิลปัจจุบัน
-                    let currentPayment = fundPayments.find(p => p.roundId == roundId && p.studentId == studentId);
+                    // 1. ตัดบิลปัจจุบัน
                     if(currentPayment) {
+                        let wasPaid = currentPayment.status.includes('จ่ายแล้ว');
                         currentPayment.paidAmt = (currentPayment.paidAmt || 0) + currentBillPay;
                         currentPayment.status = (currentPayment.paidAmt >= round.amt) ? (isCash ? 'จ่ายแล้ว (เงินสด)' : 'จ่ายแล้ว') : 'ค้างชำระ (ผ่อน)';
                         
-                        // บันทึกข้อมูลสำหรับล็อกใบเสร็จ (กำหนดค่าครั้งเดียวให้ครบถ้วน)
+                        // 🌟 ดึงคะแนนจากที่แอดมินตั้งค่าไว้และบวกแต้ม
+                        let payPoints = (appSettings.ptsConfig && appSettings.ptsConfig.pay !== undefined) ? parseInt(appSettings.ptsConfig.pay) : 10;
+                        if (!wasPaid && currentPayment.status.includes('จ่ายแล้ว') && payPoints > 0) {
+                            stu.points = (stu.points || 0) + payPoints;
+                            txHistory.unshift({ date: getNow(), name: `+${payPoints} แต้ม (ชำระเงิน "${round.title}" ครบถ้วน)`, type: 'ระบบ', amt: 0, user: currentUsername });
+                        }
+                        
+                        // บันทึกข้อมูลสำหรับล็อกใบเสร็จ
                         currentPayment.paidDate = getNow(); 
                         currentPayment.paidBy = currentUsername || 'ผู้ดูแลระบบ';
                         
@@ -4312,17 +4492,36 @@ function viewSlipPopup(url) {
                         });
                     }
                             
-                            // 2. ตัดบิลค้างเก่า
-                            otherPaymentsToUpdate.forEach(upd => {
-                                upd.payment.paidAmt = (upd.payment.paidAmt || 0) + upd.payAmt;
-                                upd.payment.status = (upd.payment.paidAmt >= upd.round.amt) ? (isCash ? 'จ่ายแล้ว (เงินสด)' : 'จ่ายแล้ว') : 'ค้างชำระ (ผ่อน)';
-                                txHistory.unshift({ date: getNow(), name: `ตัดหนี้ค้างออโต้ (${upd.round.title}): ${stu.name}`, type: 'ระบบ', amt: upd.payAmt, user: currentUsername });
-                            });
+                    // 2. ตัดบิลค้างเก่า
+                    otherPaymentsToUpdate.forEach(upd => {
+                        upd.payment.paidAmt = (upd.payment.paidAmt || 0) + upd.payAmt;
+                        upd.payment.status = (upd.payment.paidAmt >= upd.round.amt) ? (isCash ? 'จ่ายแล้ว (เงินสด)' : 'จ่ายแล้ว') : 'ค้างชำระ (ผ่อน)';
+                        txHistory.unshift({ date: getNow(), name: `ตัดหนี้ค้างออโต้ (${upd.round.title}): ${stu.name}`, type: 'ระบบ', amt: upd.payAmt, user: currentUsername });
+                    });
                             
-                            // 3. ทบยอดฝาก
-                    if (depositAdd > 0) {
-                        stu.dep = (stu.dep || 0) + depositAdd;
-                        txHistory.unshift({ date: getNow(), name: `ฝากเงินล่วงหน้า: ${stu.name}`, type: 'ระบบ', amt: depositAdd, user: currentUsername });
+                    // 3. ทบยอดฝาก และเปลี่ยนชื่อสลิป
+            if (depositAdd > 0) {
+                stu.dep = (stu.dep || 0) + depositAdd;
+                
+                // 🌟 เพิ่มบรรทัดนี้: ให้ระบบจำลิงก์สลิปที่โอนเกินไว้
+                if(currentPayment && currentPayment.slipUrl) stu.lastDepositSlip = currentPayment.slipUrl;
+                txHistory.unshift({ date: getNow(), name: `ฝากเงินล่วงหน้า (เงินโอนเกิน): ${stu.name}`, type: 'ฝาก', amt: depositAdd, user: currentUsername });
+                        
+                // 🌟 ส่งคำสั่งไปเปลี่ยนชื่อสลิปที่หลังบ้าน (Google Drive)
+                        if (!isCash && currentPayment && currentPayment.slipUrl) {
+                            callBackend({
+                                action: 'renameOverpaidSlip',
+                                fileUrl: currentPayment.slipUrl,
+                                studentId: stu.id,
+                                studentName: stu.name
+                            }).then(renameResult => {
+                                if (!renameResult || !renameResult.success) {
+                                    console.warn('เปลี่ยนชื่อสลิปยอดเกินไม่สำเร็จ:', renameResult && (renameResult.error || renameResult.message));
+                                }
+                            }).catch(error => {
+                                console.warn('เรียกเปลี่ยนชื่อสลิปยอดเกินไม่สำเร็จ:', error);
+                            });
+                        }
                     }
 
                     // 🌟 อัปเกรด: ให้อัปเดตหน้าจอทันที + กดกริ่งทันที + ส่งเซฟหลังบ้านแบบเบื้องหลัง
@@ -4511,8 +4710,9 @@ function editRoom(roomName) {
                 name: nm, 
                 number: parseInt(no), 
                 email: document.getElementById('a-email').value.trim(),
-                // 🌟 ดึงข้อมูลชื่ออังกฤษ พร้อมบังคับแปลงเป็นพิมพ์ใหญ่ทั้งหมด (Uppercase) ทันที
-                nameEn: document.getElementById('a-nmen').value.trim().toUpperCase() 
+                nameEn: document.getElementById('a-nmen').value.trim().toUpperCase(),
+                points: 0,        // 🌟 ตั้งแต้มเริ่มต้น
+                inventory: {}     // 🌟 ตั้งกระเป๋าว่างเปล่า
             };
         } 
     }).then(r => { 
@@ -4561,14 +4761,205 @@ function editRoom(roomName) {
         function deleteTxHistory(index) { Swal.fire({title: 'ลบประวัตินี้?', showCancelButton: true, confirmButtonColor: '#e3342f'}).then(r=>{if(r.isConfirmed){txHistory.splice(index,1); saveToLocal(); refreshAll();}}); }
         function renderFinHistory() { const isAdmin = (currentUserRole === 'leader' || currentUserRole === 'vice' || currentUserRole === 'treasurer'); const list = document.getElementById('fin-hist-list'); if(!list) return; if(txHistory.length === 0) { list.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-slate-400">ไม่มีประวัติ</td></tr>'; return; } let hHtml = ''; txHistory.forEach((t, i) => { let btn = isAdmin ? `<button onclick="deleteTxHistory(${i})" class="text-rose-500"><i class="fas fa-trash"></i></button>` : '-'; hHtml += `<tr class="border-b"><td class="p-3 text-xs text-slate-500">${formatDisplayDate(t.date)}</td><td class="p-3"><b>${t.name}</b><br><span class="text-[10px] bg-slate-100 px-1 rounded text-slate-500">${t.user || 'ระบบ'}</span></td><td class="p-3 text-center"><span class="px-2 py-1 rounded text-[10px] font-bold bg-slate-100">${t.type}</span></td><td class="p-3 text-right">฿${t.amt}</td><td class="p-3 text-center">${btn}</td></tr>`; }); list.innerHTML = hHtml; }
 
-        // ================= สุ่มตัวแทน (LUCKY DRAW) =================
-        function initRandomizer() { let roomEl = document.getElementById('random-room-filter'); if(!roomEl) return; let roomF = roomEl.value; let filtered = students.filter(s => roomF === 'all' || s.room === roomF); randomPool = filtered.map(s => ({ id: s.id, name: s.name, included: true, room: s.room })); renderRandomPills(); }
-        function renderRandomPills() { let container = document.getElementById('random-pills-container'); let countEl = document.getElementById('random-pool-count'); if(!container || !countEl) return; let includedCount = randomPool.filter(x => x.included).length; countEl.innerText = includedCount + ' คน'; if(randomPool.length === 0) { container.innerHTML = '<p class="text-slate-400 text-sm p-4 w-full text-center">ไม่มีข้อมูลนักศึกษาในห้องที่เลือก</p>'; return; } let pillsHtml = ''; randomPool.forEach(p => { if(p.included) { pillsHtml += `<button onclick="toggleRandomPill('${p.id}')" class="px-3 py-1.5 bg-emerald-100 border border-emerald-300 text-emerald-800 font-bold text-sm rounded-full shadow-sm hover:bg-emerald-200 transition"><i class="fas fa-check-circle mr-1"></i> ${p.name}</button>`; } else { pillsHtml += `<button onclick="toggleRandomPill('${p.id}')" class="px-3 py-1.5 bg-slate-200 border border-slate-300 text-slate-500 font-bold text-sm rounded-full shadow-sm hover:bg-slate-300 transition line-through opacity-60"><i class="fas fa-times-circle mr-1"></i> ${p.name}</button>`; } }); container.innerHTML = pillsHtml; }
-        function toggleRandomPill(id) { let p = randomPool.find(x => x.id === id); if(p) { p.included = !p.included; renderRandomPills(); } }
-        function randomExcludeAdmins() { let excludedCount = 0; randomPool.forEach(p => { let isUser = users.find(u => u.refId === p.id); if(isUser && p.included) { p.included = false; excludedCount++; } }); Swal.fire({toast:true, position:'top-end', icon:'info', title:`ยกเว้นแอดมิน (ที่ผูกบัญชีไว้) ${excludedCount} คน`, showConfirmButton:false, timer:2000}); renderRandomPills(); }
-        function randomExcludeAbsent() { let todayStr = new Date().toLocaleDateString('th-TH'); let excludedCount = 0; randomPool.forEach(p => { let hasCheckedIn = timeLogs.find(l => l.date.includes(todayStr) && l.id === p.id && l.checkIn && l.checkIn !== '-'); if(!hasCheckedIn) { p.included = false; excludedCount++; } }); Swal.fire({toast:true, position:'top-end', icon:'info', title:`ยกเว้นไป ${excludedCount} คนที่ขาดเรียน`, showConfirmButton:false, timer:1500}); renderRandomPills(); }
-        function startLuckyDraw() { let candidates = randomPool.filter(x => x.included); let countInput = parseInt(document.getElementById('random-count').value) || 1; if(candidates.length === 0) return Swal.fire('คำเตือน', 'ไม่มีรายชื่อให้สุ่ม! (โดนยกเว้นหมดแล้ว)', 'warning'); if(countInput > candidates.length) return Swal.fire('คำเตือน', 'จำนวนคนที่ต้องการสุ่ม มากกว่ารายชื่อที่มีอยู่ครับ', 'warning'); let timerInterval; Swal.fire({ title: '🎰 กำลังสุ่มตัวแทน...', html: '<div id="swal-random-name" class="text-3xl md:text-4xl font-bold text-purple-600 mt-4 mb-4 h-20 flex items-center justify-center bg-purple-50 rounded-xl border-4 border-purple-200 shadow-inner animate-slot">เตรียมพร้อม...</div>', showConfirmButton: false, allowOutsideClick: false, didOpen: () => { let swalName = document.getElementById('swal-random-name'); let ticks = 0; timerInterval = setInterval(() => { let randIndex = Math.floor(Math.random() * candidates.length); swalName.innerText = candidates[randIndex].name; ticks++; if(ticks > 30) { clearInterval(timerInterval); finishLuckyDraw(candidates, countInput); } }, 100); }, willClose: () => { clearInterval(timerInterval); } }); }
-        function finishLuckyDraw(candidates, count) { let winners = []; let tempCandidates = [...candidates]; for(let i=0; i<count; i++) { let randIndex = Math.floor(Math.random() * tempCandidates.length); winners.push(tempCandidates[randIndex]); tempCandidates.splice(randIndex, 1); } let winnersHtml = ''; winners.forEach(w => { winnersHtml += `<div class="bg-gradient-to-r from-emerald-400 to-teal-500 text-white p-3 rounded-xl shadow-md font-bold text-lg mb-2 transform hover:scale-105 transition"><i class="fas fa-star text-yellow-300 mr-2"></i> ${w.name} <span class="text-xs font-normal text-emerald-100">(ห้อง ${w.room})</span></div>`; }); Swal.fire({ title: '🎉 โฉมหน้าผู้โชคดี! 🎉', html: `<div class="mt-4 text-left">${winnersHtml}</div>`, icon: 'success', confirmButtonText: '💾 บันทึกประวัติ', confirmButtonColor: '#8b5cf6', showCancelButton: true, cancelButtonText: 'ปิด (ไม่บันทึก)', cancelButtonColor: '#94a3b8' }).then((res) => { if(res.isConfirmed) { Swal.fire({ title: 'บันทึกประวัติการสุ่ม', input: 'text', inputLabel: 'ชื่องาน / กิจกรรมที่สุ่มได้ (เช่น เป็นเวร, พรีเซนต์งาน)', inputPlaceholder: 'กรอกชื่องานที่นี่...', showCancelButton: true, confirmButtonText: 'บันทึก', confirmButtonColor: '#10b981', preConfirm: (taskName) => { if (!taskName) Swal.showValidationMessage('กรุณากรอกชื่องานด้วยครับ'); return taskName; } }).then((taskRes) => { if(taskRes.isConfirmed) { let wNames = winners.map(w => w.name).join(', '); txHistory.unshift({ date: getNow(), name: `🎲 ตัวแทนงาน [${taskRes.value}]: ${wNames}`, type: 'ระบบ', amt: 0, user: currentUsername }); saveToLocal(); refreshAll(); Swal.fire('บันทึกสำเร็จ!', 'เก็บประวัติผู้โชคดีลงระบบเรียบร้อย', 'success'); winners.forEach(w => toggleRandomPill(w.id)); } }); } }); }
+       // ================= สุ่มตัวแทน (LUCKY DRAW) =================
+        function initRandomizer() { 
+            let roomEl = document.getElementById('random-room-filter'); 
+            if(!roomEl) return; 
+            let roomF = roomEl.value; 
+            let filtered = students.filter(s => roomF === 'all' || s.room === roomF); 
+            randomPool = filtered.map(s => ({ id: s.id, name: s.name, included: true, room: s.room })); 
+            renderRandomPills(); 
+        }
+
+        function renderRandomPills() { 
+            let container = document.getElementById('random-pills-container'); 
+            let countEl = document.getElementById('random-pool-count'); 
+            if(!container || !countEl) return; 
+            
+            let includedCount = randomPool.filter(x => x.included).length; 
+            countEl.innerText = includedCount + ' คน'; 
+            
+            if(randomPool.length === 0) { 
+                container.innerHTML = '<p class="text-slate-400 text-sm p-4 w-full text-center">ไม่มีข้อมูลนักศึกษาในห้องที่เลือก</p>'; 
+                return; 
+            } 
+            
+            let pillsHtml = ''; 
+            randomPool.forEach(p => { 
+                if(p.included) { 
+                    pillsHtml += `<button onclick="toggleRandomPill('${p.id}')" class="px-3 py-1.5 bg-emerald-100 border border-emerald-300 text-emerald-800 font-bold text-sm rounded-full shadow-sm hover:bg-emerald-200 transition"><i class="fas fa-check-circle mr-1"></i> ${p.name}</button>`; 
+                } else { 
+                    pillsHtml += `<button onclick="toggleRandomPill('${p.id}')" class="px-3 py-1.5 bg-slate-200 border border-slate-300 text-slate-500 font-bold text-sm rounded-full shadow-sm hover:bg-slate-300 transition line-through opacity-60"><i class="fas fa-times-circle mr-1"></i> ${p.name}</button>`; 
+                } 
+            }); 
+            container.innerHTML = pillsHtml; 
+        }
+
+        function toggleRandomPill(id) { 
+            let p = randomPool.find(x => x.id === id); 
+            if(p) { 
+                p.included = !p.included; 
+                renderRandomPills(); 
+            } 
+        }
+
+        function randomExcludeAdmins() { 
+            let excludedCount = 0; 
+            randomPool.forEach(p => { 
+                let isUser = users.find(u => u.refId === p.id); 
+                if(isUser && p.included) { 
+                    p.included = false; 
+                    excludedCount++; 
+                } 
+            }); 
+            Swal.fire({toast:true, position:'top-end', icon:'info', title:`ยกเว้นแอดมิน (ที่ผูกบัญชีไว้) ${excludedCount} คน`, showConfirmButton:false, timer:2000}); 
+            renderRandomPills(); 
+        }
+
+        function randomExcludeAbsent() { 
+            let todayStr = new Date().toLocaleDateString('th-TH'); 
+            let excludedCount = 0; 
+            randomPool.forEach(p => { 
+                let hasCheckedIn = timeLogs.find(l => l.date.includes(todayStr) && l.id === p.id && l.checkIn && l.checkIn !== '-'); 
+                if(!hasCheckedIn) { 
+                    p.included = false; 
+                    excludedCount++; 
+                } 
+            }); 
+            Swal.fire({toast:true, position:'top-end', icon:'info', title:`ยกเว้นไป ${excludedCount} คนที่ขาดเรียน`, showConfirmButton:false, timer:1500}); 
+            renderRandomPills(); 
+        }
+
+        function startLuckyDraw() { 
+            let candidates = randomPool.filter(x => x.included); 
+            let countInput = parseInt(document.getElementById('random-count').value) || 1; 
+            
+            if(candidates.length === 0) return Swal.fire('คำเตือน', 'ไม่มีรายชื่อให้สุ่ม! (โดนยกเว้นหมดแล้ว)', 'warning'); 
+            if(countInput > candidates.length) return Swal.fire('คำเตือน', 'จำนวนคนที่ต้องการสุ่ม มากกว่ารายชื่อที่มีอยู่ครับ', 'warning'); 
+            
+            let timerInterval; 
+            Swal.fire({ 
+                title: '🎰 กำลังสุ่มตัวแทน...', 
+                html: '<div id="swal-random-name" class="text-3xl md:text-4xl font-bold text-purple-600 mt-4 mb-4 h-20 flex items-center justify-center bg-purple-50 rounded-xl border-4 border-purple-200 shadow-inner animate-slot">เตรียมพร้อม...</div>', 
+                showConfirmButton: false, 
+                allowOutsideClick: false, 
+                didOpen: () => { 
+                    let swalName = document.getElementById('swal-random-name'); 
+                    let ticks = 0; 
+                    timerInterval = setInterval(() => { 
+                        let randIndex = Math.floor(Math.random() * candidates.length); 
+                        swalName.innerText = candidates[randIndex].name; 
+                        ticks++; 
+                        if(ticks > 30) { 
+                            clearInterval(timerInterval); 
+                            finishLuckyDraw(candidates, countInput); 
+                        } 
+                    }, 100); 
+                }, 
+                willClose: () => { clearInterval(timerInterval); } 
+            }); 
+        }
+
+        function finishLuckyDraw(candidates, count) { 
+            let winners = []; 
+            let tempCandidates = [...candidates]; 
+            
+            // สุ่มรายชื่อตามจำนวนที่แอดมินเลือก (เช่น สุ่มทีละ 1 หรือสุ่มทีละ 3)
+            for(let i=0; i<count; i++) { 
+                let randIndex = Math.floor(Math.random() * tempCandidates.length); 
+                winners.push(tempCandidates[randIndex]); 
+                tempCandidates.splice(randIndex, 1); 
+            } 
+
+            // 🌟 เช็คว่ามีใครในกลุ่มผู้ชนะที่ "มีโล่ป้องกัน" หรือไม่
+            let shieldedWinners = [];
+            let validWinners = [];
+
+            winners.forEach(w => {
+                let stuData = students.find(s => s.id === w.id);
+                if (stuData && stuData.inventory && stuData.inventory.shield > 0) {
+                    // คนนี้มีโล่! หักโล่ทิ้ง 1 อัน แล้วแยกไว้กลุ่มรอดตัว
+                    stuData.inventory.shield -= 1;
+                    shieldedWinners.push(stuData);
+                    txHistory.unshift({ date: getNow(), name: `🛡️ โล่ป้องกันสุ่มทำงาน! ป้องกัน: ${stuData.name}`, type: 'ระบบ', amt: 0, user: 'ระบบ Lucky Draw' });
+                } else {
+                    // คนนี้ไม่มีโล่ โดนจับเป็นผู้โชคดี
+                    validWinners.push(w);
+                }
+            });
+
+            // ถ้ามีคนใช้โล่ เซฟประวัติการหักโล่ทันที
+            if (shieldedWinners.length > 0) saveToLocal(true);
+
+            // กรณีที่ 1: ทุกคนที่สุ่มได้ ดันมีโล่หมดเลย! (รอดทุกคน)
+            if (validWinners.length === 0 && shieldedWinners.length > 0) {
+                let shieldNames = shieldedWinners.map(s => s.name).join('<br>');
+                Swal.fire({
+                    icon: 'info',
+                    title: '🛡️ โล่ป้องกันทำงาน!',
+                    html: `นักศึกษาเหล่านี้ถูกสุ่มเจอ แต่ใช้สิทธิโล่ป้องกันสุ่ม!<br><br><b class="text-indigo-600">${shieldNames}</b><br><br><span class="text-sm text-slate-500">กรุณากดสุ่มใหม่อีกครั้งครับ</span>`,
+                    confirmButtonText: 'รับทราบ',
+                    confirmButtonColor: '#4f46e5'
+                }).then(() => {
+                    // เตะคนที่มีโล่ออกจากตะกร้าสุ่มในรอบนี้ เพื่อสุ่มใหม่จะได้ไม่โดนซ้ำ
+                    shieldedWinners.forEach(sw => toggleRandomPill(sw.id));
+                });
+                return;
+            }
+
+            // กรณีที่ 2: มีคนโดนโล่เด้ง และมีคนที่โดนหวยตก (โชคร้ายไม่มีโล่)
+            if (shieldedWinners.length > 0 && validWinners.length > 0) {
+                let shieldNames = shieldedWinners.map(s => s.name).join(', ');
+                Swal.fire({
+                    toast: true, position: 'top-end', icon: 'info',
+                    title: `โล่ป้องกันทำงาน: ${shieldNames} รอดตัวไป!`,
+                    showConfirmButton: false, timer: 3000
+                });
+            }
+
+            // ประกาศผลคนผู้โชคดี (คนที่ไม่มีโล่)
+            let winnersHtml = ''; 
+            validWinners.forEach(w => { 
+                winnersHtml += `<div class="bg-gradient-to-r from-emerald-400 to-teal-500 text-white p-3 rounded-xl shadow-md font-bold text-lg mb-2 transform hover:scale-105 transition"><i class="fas fa-star text-yellow-300 mr-2"></i> ${w.name} <span class="text-xs font-normal text-emerald-100">(ห้อง ${w.room})</span></div>`; 
+            }); 
+            
+            Swal.fire({ 
+                title: '🎉 โฉมหน้าผู้โชคดี! 🎉', 
+                html: `<div class="mt-4 text-left">${winnersHtml}</div>`, 
+                icon: 'success', 
+                confirmButtonText: '💾 บันทึกประวัติ', 
+                confirmButtonColor: '#8b5cf6', 
+                showCancelButton: true, 
+                cancelButtonText: 'ปิด (ไม่บันทึก)', 
+                cancelButtonColor: '#94a3b8' 
+            }).then((res) => { 
+                if(res.isConfirmed) { 
+                    Swal.fire({ 
+                        title: 'บันทึกประวัติการสุ่ม', 
+                        input: 'text', 
+                        inputLabel: 'ชื่องาน / กิจกรรมที่สุ่มได้ (เช่น เป็นเวร, พรีเซนต์งาน)', 
+                        inputPlaceholder: 'กรอกชื่องานที่นี่...', 
+                        showCancelButton: true, 
+                        confirmButtonText: 'บันทึก', 
+                        confirmButtonColor: '#10b981', 
+                        preConfirm: (taskName) => { 
+                            if (!taskName) Swal.showValidationMessage('กรุณากรอกชื่องานด้วยครับ'); 
+                            return taskName; 
+                        } 
+                    }).then((taskRes) => { 
+                        if(taskRes.isConfirmed) { 
+                            let wNames = validWinners.map(w => w.name).join(', '); 
+                            txHistory.unshift({ date: getNow(), name: `🎲 ตัวแทนงาน [${taskRes.value}]: ${wNames}`, type: 'ระบบ', amt: 0, user: currentUsername }); 
+                            saveToLocal(); 
+                            refreshAll(); 
+                            Swal.fire('บันทึกสำเร็จ!', 'เก็บประวัติผู้โชคดีลงระบบเรียบร้อย', 'success'); 
+                            validWinners.forEach(w => toggleRandomPill(w.id)); 
+                            shieldedWinners.forEach(w => toggleRandomPill(w.id)); // ปิดรายชื่อคนที่เสียโล่ไปด้วย
+                        } 
+                    }); 
+                } 
+            }); 
+        }
         // ================= ระบบกระดานโหวต (STUDENT VOICE) =================
 function renderPolls() {
     if (!appSettings.polls) appSettings.polls = [];
@@ -4714,6 +5105,11 @@ function deletePoll(pollId) { Swal.fire({title: 'ลบโหวตนี้?', 
 
         // ================= REFRESH ALL =================
         function refreshAll() {
+            // 🌟 โหลดค่าตั้งค่าคะแนน
+            let elPtsPay = document.getElementById('setting-pts-pay');
+            let elPtsLate = document.getElementById('setting-pts-late');
+            if(elPtsPay) elPtsPay.value = (appSettings.ptsConfig && appSettings.ptsConfig.pay !== undefined) ? appSettings.ptsConfig.pay : 10;
+            if(elPtsLate) elPtsLate.value = (appSettings.ptsConfig && appSettings.ptsConfig.late !== undefined) ? appSettings.ptsConfig.late : 2;
             recalculateDebts();
             let elHomeRm = document.getElementById('home-room-filter'); let cHomeRm = elHomeRm ? elHomeRm.value : 'all'; 
             let elChkRm = document.getElementById('roomSelect'); let cChkRm = elChkRm ? elChkRm.value : 'all'; 
@@ -4769,11 +5165,11 @@ function deletePoll(pollId) { Swal.fire({title: 'ลบโหวตนี้?', 
             let btnCreateAct = document.getElementById('btn-create-act'); if(btnCreateAct) btnCreateAct.classList.toggle('hidden', !(currentUserRole === 'leader' || currentUserRole === 'vice' || currentUserRole === 'treasurer'));
             let adminRemind = document.getElementById('admin-reminder-tools'); if(adminRemind) adminRemind.classList.toggle('hidden', !(currentUserRole === 'leader' || currentUserRole === 'vice' || currentUserRole === 'treasurer'));
 
-            renderExpenseTable(); renderHomeDirectory(); renderActivities(); renderCheckinTableOnly(); renderFinHistory(); renderFundTable(); renderTimeHistoryTable();updateQuickToggleBtn(); renderPolls();updateRoomDropdowns();updateSidebarBadges();renderLeaderboard();
+            renderExpenseTable(); renderHomeDirectory(); renderActivities(); renderCheckinTableOnly(); renderFinHistory(); renderFundTable(); renderTimeHistoryTable();updateQuickToggleBtn(); renderPolls();updateRoomDropdowns();updateSidebarBadges();renderLeaderboard();renderShopAdmin();
             if(randomPool.length === 0 && students.length > 0) initRandomizer();
             
             let adminStudents = cAdmRm === 'all' ? students : students.filter(s => s.room === cAdmRm);
-            let elAdmDbList = document.getElementById('admin-db-list'); if(elAdmDbList) elAdmDbList.innerHTML = adminStudents.map(s => `<tr class="border-b"><td class="p-3 text-center font-bold text-emerald-600">${s.number}</td><td class="p-3"><b>${s.name}</b> <br><span class="text-xs text-slate-400 font-mono">${s.id}</span></td><td class="p-3 text-center">${currentUserRole==='leader'||currentUserRole==='vice' ? `<button onclick="editStudent('${s.id}')" class="text-blue-500 mx-1"><i class="fas fa-edit"></i></button><button onclick="deleteStudent('${s.id}')" class="text-rose-500 mx-1"><i class="fas fa-trash"></i></button>` : `-`}</td></tr>`).join('');
+            let elAdmDbList = document.getElementById('admin-db-list'); if(elAdmDbList) elAdmDbList.innerHTML = adminStudents.map(s => `<tr class="border-b"><td class="p-3 text-center font-bold text-emerald-600">${s.number}</td><td class="p-3"><b>${s.name}</b> <br><span class="text-xs text-slate-400 font-mono">${s.id}</span></td><td class="p-3 text-center">${currentUserRole==='leader'||currentUserRole==='vice' ? `<button onclick="adjustStudentPoints('${s.id}')" class="text-amber-500 mx-1" title="จัดการคะแนน"><i class="fas fa-star"></i></button><button onclick="editStudent('${s.id}')" class="text-blue-500 mx-1"><i class="fas fa-edit"></i></button><button onclick="deleteStudent('${s.id}')" class="text-rose-500 mx-1"><i class="fas fa-trash"></i></button>` : `-`}</td></tr>`).join('');
             
             const rn = { leader: 'หัวหน้า', vice: 'รองหัวหน้า', treasurer: 'เหรัญญิก' };
             let elUserList = document.getElementById('user-list'); if(elUserList) { let uHtml = ''; users.filter(u=>u.user!=='admin').forEach(u => { let uBtn = (currentUserRole==='leader'||currentUserRole==='vice') ? `<button onclick="editUserAction('${u.user}')" class="text-blue-500 mx-1"><i class="fas fa-edit"></i></button><button onclick="deleteUserAction('${u.user}')" class="text-rose-500 mx-1"><i class="fas fa-trash"></i></button>` : '-'; let linkedStu = students.find(s => s.id === u.refId); let linkedName = linkedStu ? `<br><span class="text-[10px] text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-md"><i class="fas fa-link"></i> ${linkedStu.name}</span>` : ''; uHtml += `<tr class="border-b"><td class="p-4 text-sm"><b>${u.user}</b>${linkedName}</td><td class="p-4 text-sm">${rn[u.role]}</td><td class="p-4 text-center">${uBtn}</td></tr>`; }); elUserList.innerHTML = uHtml; }
@@ -5814,7 +6210,653 @@ function linkLineAccount() {
     
     window.open(lineUrl, '_blank');
 }
+
+// 🌟 ฟังก์ชันจัดการแต้มโดยแอดมิน (Manual)
+function adjustStudentPoints(studentId) {
+    let stu = students.find(s => s.id === studentId);
+    if(!stu) return;
+
+    Swal.fire({
+        title: `จัดการคะแนน: ${stu.name}`,
+        html: `
+        <div class="text-left">
+            <p class="text-sm font-bold text-slate-600 mb-4 bg-amber-50 p-3 rounded-lg border border-amber-200 text-center">คะแนนปัจจุบัน: <span class="text-amber-600 text-xl">${stu.points || 0}</span> แต้ม</p>
+            <label class="text-xs font-bold text-slate-500">จำนวนคะแนน (ใส่ติดลบเพื่อหักแต้ม)</label>
+            <input type="number" id="adj-pt-amt" class="modern-input" placeholder="เช่น 10 หรือ -5">
+            <label class="text-xs font-bold text-slate-500 mt-2">หมายเหตุ / สาเหตุที่ให้คะแนน</label>
+            <input type="text" id="adj-pt-note" class="modern-input" placeholder="เช่น ช่วยงานอาจารย์, มาสาย">
+        </div>
+        `,
+        showCancelButton: true, confirmButtonText: 'บันทึกคะแนน', confirmButtonColor: '#d97706',
+        preConfirm: () => {
+            let amt = parseInt(document.getElementById('adj-pt-amt').value);
+            let note = document.getElementById('adj-pt-note').value.trim();
+            if (isNaN(amt)) return Swal.showValidationMessage('กรุณาใส่ตัวเลขคะแนน');
+            return { amt, note };
+        }
+    }).then(res => {
+        if(res.isConfirmed) {
+            stu.points = (stu.points || 0) + res.value.amt;
+            let actionText = res.value.amt > 0 ? `+${res.value.amt} แต้ม` : `${res.value.amt} แต้ม`;
+            txHistory.unshift({ date: getNow(), name: `ปรับคะแนน (${actionText}): ${stu.name} [สาเหตุ: ${res.value.note || '-'}]`, type: 'ระบบ', amt: 0, user: currentUsername });
+            
+            saveToLocal(true);
+            refreshAll();
+            Swal.fire({toast: true, position: 'top-end', icon: 'success', title: 'อัปเดตคะแนนสำเร็จ', showConfirmButton: false, timer: 1500});
+        }
+    });
+}
+
+// 🌟 ฟังก์ชันบันทึกการตั้งค่าแต้ม
+function updatePointSettings() {
+    if (!appSettings.ptsConfig) appSettings.ptsConfig = { pay: 10, late: 2 };
+    appSettings.ptsConfig.pay = parseInt(document.getElementById('setting-pts-pay').value) || 0;
+    appSettings.ptsConfig.late = parseInt(document.getElementById('setting-pts-late').value) || 0;
+    saveToLocal(true);
+}
+
+// 🏆 ฟังก์ชันจัดอันดับ Leaderboard (Top 10)
+function renderLeaderboard() {
+    let podium = document.getElementById('leaderboard-podium');
+    let list = document.getElementById('leaderboard-list');
+    if(!podium || !list) return;
+
+    // ดึงเด็กที่มีแต้ม > 0 เรียงจากมากไปน้อย
+    let sorted = [...students].filter(s => (s.points || 0) > 0).sort((a, b) => b.points - a.points).slice(0, 10);
+    
+    if(sorted.length === 0) {
+        podium.innerHTML = '<p class="text-white w-full text-center">ยังไม่มีข้อมูลคะแนนในระบบ</p>';
+        list.innerHTML = '<tr><td colspan="3" class="text-center p-4 text-slate-400">ยังไม่มีผู้ติดอันดับ</td></tr>';
+        return;
+    }
+
+    // วาดแท่นรับรางวัล Top 3 (สลับตำแหน่ง 2-1-3 ให้สวยงาม)
+    let phtml = '';
+    let top3 = [sorted[1], sorted[0], sorted[2]]; // [อันดับ 2, อันดับ 1, อันดับ 3]
+    let colors = ['bg-slate-200', 'bg-yellow-300', 'bg-orange-200'];
+    let heights = ['h-32', 'h-40', 'h-24'];
+    let borders = ['border-slate-300', 'border-yellow-400', 'border-orange-300'];
+    let ranks = [2, 1, 3];
+
+    top3.forEach((stu, idx) => {
+        if(stu) {
+            phtml += `
+            <div class="flex flex-col items-center justify-end w-1/3 max-w-[100px]">
+                <div class="text-center mb-2 z-10">
+                    <div class="w-12 h-12 md:w-16 md:h-16 rounded-full border-4 ${borders[idx]} bg-white mx-auto flex items-center justify-center font-bold text-slate-700 shadow-md">${getInitials(stu.name)}</div>
+                    <p class="text-white font-bold text-xs mt-1 truncate w-20 md:w-24 drop-shadow-md">${stu.name.split(' ')[0]}</p>
+                    <p class="text-yellow-200 text-[10px] font-bold drop-shadow-md">${stu.points} ✨</p>
+                </div>
+                <div class="w-full ${colors[idx]} ${heights[idx]} rounded-t-xl border-x border-t ${borders[idx]} shadow-inner flex items-start justify-center pt-2 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-white opacity-20"></div>
+                    <span class="font-black text-2xl opacity-50 relative z-10">${ranks[idx]}</span>
+                </div>
+            </div>`;
+        } else {
+            phtml += `<div class="w-1/3 max-w-[100px]"></div>`;
+        }
+    });
+    podium.innerHTML = phtml;
+
+    // วาดรายชื่ออันดับ 4-10
+    let lhtml = '';
+    for(let i = 3; i < sorted.length; i++) {
+        let stu = sorted[i];
+        lhtml += `
+        <tr class="border-b border-slate-100 hover:bg-slate-50">
+            <td class="p-3 text-center font-bold text-slate-400">#${i+1}</td>
+            <td class="p-3 font-bold text-slate-700">${stu.name}</td>
+            <td class="p-3 text-center text-xs text-slate-500">${stu.room || '-'}</td>
+            <td class="p-3 text-right font-bold text-amber-600">${stu.points} ✨</td>
+        </tr>`;
+    }
+    list.innerHTML = lhtml;
+}
+
+// 🛒 โหลดหน้าต่างร้านค้าให้นักศึกษา
+function openPointShop(studentId) {
+    let stu = students.find(s => s.id === studentId);
+    if(!stu) return;
+    if(!stu.inventory) stu.inventory = {};
+
+    // ถ้าแอดมินยังไม่เคยสร้างสินค้าเลย ให้มีสินค้าตั้งต้น 2 อย่าง
+    if(!appSettings.shopItems){
+        appSettings.shopItems = [
+            { id: 'shield', name: 'โล่ป้องกันสุ่ม', price: 100, type: 'shield', value: 1, icon: 'fa-shield-alt', color: 'indigo', desc: 'ป้องกันการโดนสุ่มชื่อ 1 ครั้ง' }
+        ];
+    }
+
+    let itemsHtml = '';
+    appSettings.shopItems.forEach((itm, idx) => {
+        // จัดการสีให้สวยงาม
+        let th = { bg:'bg-blue-50', border:'border-blue-200', text:'text-blue-700', sub:'text-blue-600', badge:'bg-blue-600 text-white' };
+        if(itm.color==='emerald') th = { bg:'bg-emerald-50', border:'border-emerald-200', text:'text-emerald-700', sub:'text-emerald-600', badge:'bg-emerald-600 text-white' };
+        else if(itm.color==='indigo') th = { bg:'bg-indigo-50', border:'border-indigo-200', text:'text-indigo-700', sub:'text-indigo-600', badge:'bg-indigo-600 text-white' };
+
+        // โชว์จำนวนที่มีอยู่ในกระเป๋า
+        let badgeInfo = '';
+        if(itm.type === 'shield') badgeInfo = `<span class="${th.badge} text-[10px] px-1.5 py-0.5 rounded-md ml-1 shadow-sm">มี ${stu.inventory.shield || 0} อัน</span>`;
+        else if(itm.type === 'custom') badgeInfo = `<span class="${th.badge} text-[10px] px-1.5 py-0.5 rounded-md ml-1 shadow-sm">มี ${stu.inventory[itm.name] || 0} อัน</span>`;
+
+        itemsHtml += `
+        <div class="border ${th.border} ${th.bg} p-3 rounded-xl flex justify-between items-center cursor-pointer hover:opacity-80 transition shadow-sm mb-2" onclick="buyShopItem('${studentId}', ${idx})">
+            <div>
+                <p class="font-bold ${th.text} mb-0.5"><i class="fas ${itm.icon} text-lg mr-2"></i>${itm.name} ${badgeInfo}</p>
+                <p class="text-[10px] ${th.sub} leading-tight">${itm.desc}</p>
+            </div>
+            <div class="bg-white px-3 py-1.5 rounded-lg border ${th.border} shadow-sm font-black ${th.text} text-sm shrink-0">
+                ${itm.price} ✨
+            </div>
+        </div>`;
+    });
+
+    Swal.fire({
+        title: '🛒 ร้านค้าสิทธิพิเศษ (Point Shop)',
+        html: `
+        <div class="mb-4 bg-amber-50 rounded-xl p-4 text-center border border-amber-200 shadow-inner">
+            <p class="text-sm font-bold text-slate-600">คะแนนสะสมของคุณ</p>
+            <p class="text-4xl font-black text-amber-600 mt-1">${stu.points || 0} <span class="text-lg">✨</span></p>
+        </div>
+        <div class="grid grid-cols-1 text-left max-h-[300px] overflow-y-auto pr-1">
+            ${itemsHtml}
+        </div>
+        `,
+        showConfirmButton: false, showCloseButton: true,
+    });
+}
+
+// 🛍️ ระบบตัดคะแนนเมื่อกดซื้อสินค้า
+function buyShopItem(studentId, itemIdx) {
+    let stu = students.find(s => s.id === studentId);
+    let itm = appSettings.shopItems[itemIdx];
+    if(!stu || !itm) return;
+
+    if((stu.points || 0) < itm.price) return Swal.fire('แต้มไม่พอ', `คุณต้องมีอย่างน้อย ${itm.price} แต้ม`, 'error').then(()=>openPointShop(studentId));
+
+    Swal.fire({
+        title: `ยืนยันการแลก "${itm.name}"?`,
+        text: `ใช้ ${itm.price} แต้มในการแลกเปลี่ยน`,
+        icon: 'question', showCancelButton: true, confirmButtonText: 'ยืนยันแลก', confirmButtonColor: '#10b981'
+    }).then(res => {
+        if(res.isConfirmed) {
+            stu.points -= itm.price;
+            
+            if(itm.type === 'deposit') {
+                stu.dep = (stu.dep || 0) + itm.value;
+                txHistory.unshift({ date: getNow(), name: `แลกแต้มซื้อ "${itm.name}" (เพิ่มเงินฝาก ${itm.value}฿)`, type: 'ฝาก', amt: itm.value, user: stu.name });
+            } 
+            else if (itm.type === 'shield') {
+                stu.inventory.shield = (stu.inventory.shield || 0) + itm.value;
+                txHistory.unshift({ date: getNow(), name: `แลกแต้มซื้อ "${itm.name}"`, type: 'ระบบ', amt: 0, user: stu.name });
+            }
+            else {
+                stu.inventory[itm.name] = (stu.inventory[itm.name] || 0) + itm.value;
+                txHistory.unshift({ date: getNow(), name: `แลกแต้มซื้อไอเทม "${itm.name}"`, type: 'ระบบ', amt: 0, user: stu.name });
+            }
+            
+            saveToLocal(true); refreshAll();
+            Swal.fire({icon:'success', title:'สำเร็จ!', text:`ได้รับ ${itm.name} เรียบร้อยแล้ว`, timer: 1500, showConfirmButton: false}).then(()=> openPointShop(studentId));
+        }
+    });
+}
+
+// ================= จัดการร้านค้า (ADMIN) =================
+function renderShopAdmin() {
+    let container = document.getElementById('admin-shop-list');
+    if(!container) return;
+    if(!appSettings.shopItems) appSettings.shopItems = [];
+    
+    let html = '';
+    appSettings.shopItems.forEach((itm, idx) => {
+        let typeText = itm.type === 'deposit' ? 'เงินฝาก' : (itm.type === 'shield' ? 'โล่ป้องกัน' : 'ไอเทมทั่วไป');
+        let colorClass = itm.type === 'deposit' ? 'emerald' : (itm.type === 'shield' ? 'indigo' : 'blue');
         
+        // (แก้ในฟังก์ชัน renderShopAdmin)
+        html += `
+        <div class="border p-3 rounded-xl bg-white shadow-sm flex justify-between items-center border-l-4 border-l-${colorClass}-500">
+            <div>
+                <p class="font-bold text-slate-700 leading-tight">${itm.name}</p>
+                <p class="text-[10px] text-slate-500 mt-1"><b class="text-amber-500">${itm.price} ✨</b> | ${typeText}</p>
+            </div>
+            <div class="flex gap-1 shrink-0">
+                <button onclick="editShopItem(${idx})" class="text-blue-500 hover:text-blue-700 hover:bg-blue-50 w-8 h-8 rounded-full transition shadow-sm border border-slate-100 flex items-center justify-center"><i class="fas fa-edit"></i></button>
+                <button onclick="deleteShopItem(${idx})" class="text-rose-400 hover:text-rose-600 hover:bg-rose-50 w-8 h-8 rounded-full transition shadow-sm border border-slate-100 flex items-center justify-center"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>`;
+    });
+    container.innerHTML = html;
+}
+
+function addNewShopItem() {
+    Swal.fire({
+        title: '📦 สร้างสินค้าใหม่',
+        html: `
+            <div class="text-left space-y-3 mt-3">
+                <div><label class="text-xs font-bold text-slate-500">ชื่อสินค้า / สิทธิพิเศษ</label><input id="swal-shop-name" class="modern-input mb-0" placeholder="เช่น บัตรลางาน, บัตรกันสาย"></div>
+                <div><label class="text-xs font-bold text-slate-500">ราคา (แต้ม ✨)</label><input type="number" id="swal-shop-price" class="modern-input mb-0" placeholder="เช่น 150"></div>
+                <div><label class="text-xs font-bold text-slate-500">คำอธิบายสั้นๆ</label><input id="swal-shop-desc" class="modern-input mb-0" placeholder="เช่น ใช้แสดงเพื่อลบประวัติมาสาย 1 ครั้ง"></div>
+                <div><label class="text-xs font-bold text-slate-500">ประเภทไอเทม</label>
+                <select id="swal-shop-type" class="modern-input mb-0 font-bold text-slate-600">
+                    <option value="custom">ไอเทมทั่วไป (เก็บเข้ากระเป๋า นำไปใช้โชว์ได้)</option>
+                    <option value="deposit">เงินฝาก (ทบเงินกองกลางอัตโนมัติ)</option>
+                    <option value="shield">โล่ป้องกัน (ข้ามชื่อระบบ Lucky Draw)</option>
+                </select></div>
+                <div><label class="text-xs font-bold text-slate-500">มูลค่าที่ได้รับ</label><input type="number" id="swal-shop-val" class="modern-input mb-0" value="1" placeholder="ได้ของกี่ชิ้น หรือได้เงินกี่บาท"></div>
+            </div>
+        `,
+        showCancelButton: true, confirmButtonText: 'บันทึก', confirmButtonColor: '#4f46e5',
+        preConfirm: () => {
+            let name = document.getElementById('swal-shop-name').value.trim();
+            let price = parseInt(document.getElementById('swal-shop-price').value);
+            if(!name || isNaN(price)) return Swal.showValidationMessage('กรุณากรอกชื่อและราคาให้ครบถ้วน');
+            return {
+                id: 'item_' + Date.now(),
+                name: name, price: price,
+                desc: document.getElementById('swal-shop-desc').value.trim() || 'สินค้าสิทธิพิเศษ',
+                type: document.getElementById('swal-shop-type').value,
+                value: parseInt(document.getElementById('swal-shop-val').value) || 1
+            }
+        }
+    }).then(res => {
+        if(res.isConfirmed) {
+            let itm = res.value;
+            itm.icon = itm.type === 'deposit' ? 'fa-coins' : (itm.type === 'shield' ? 'fa-shield-alt' : 'fa-box-open');
+            itm.color = itm.type === 'deposit' ? 'emerald' : (itm.type === 'shield' ? 'indigo' : 'blue');
+            if(!appSettings.shopItems) appSettings.shopItems = [];
+            appSettings.shopItems.push(itm);
+            saveToLocal(true); renderShopAdmin();
+            Swal.fire({toast:true, position:'top-end', icon:'success', title:'เพิ่มสินค้าแล้ว', showConfirmButton:false, timer:1500});
+        }
+    });
+}
+
+function deleteShopItem(idx) {
+    Swal.fire({title: 'ลบสินค้านี้?', icon: 'warning', showCancelButton: true, confirmButtonText: 'ลบทิ้ง', confirmButtonColor: '#ef4444'}).then(res => {
+        if(res.isConfirmed) { appSettings.shopItems.splice(idx, 1); saveToLocal(true); renderShopAdmin(); }
+    });
+}
+// ✏️ ฟังก์ชันแก้ไขสินค้าเดิม
+function editShopItem(idx) {
+    let itm = appSettings.shopItems[idx];
+    if(!itm) return;
+
+    Swal.fire({
+        title: '✏️ แก้ไขข้อมูลสินค้า',
+        html: `
+            <div class="text-left space-y-3 mt-3">
+                <div><label class="text-xs font-bold text-slate-500">ชื่อสินค้า / สิทธิพิเศษ</label>
+                <input id="edit-shop-name" class="modern-input mb-0" value="${itm.name}"></div>
+                
+                <div><label class="text-xs font-bold text-slate-500">ราคา (แต้ม ✨)</label>
+                <input type="number" id="edit-shop-price" class="modern-input mb-0" value="${itm.price}"></div>
+                
+                <div><label class="text-xs font-bold text-slate-500">คำอธิบายสั้นๆ</label>
+                <input id="edit-shop-desc" class="modern-input mb-0" value="${itm.desc || ''}"></div>
+                
+                <div class="p-2 bg-slate-50 border rounded-lg mt-2 text-xs text-slate-500 text-center">
+                    <i class="fas fa-info-circle mr-1"></i> (ไม่สามารถเปลี่ยนประเภทไอเทมได้ หากต้องการเปลี่ยนกรุณาลบแล้วสร้างใหม่)
+                </div>
+            </div>
+        `,
+        showCancelButton: true, confirmButtonText: 'บันทึกการแก้ไข', confirmButtonColor: '#3b82f6',
+        preConfirm: () => {
+            let name = document.getElementById('edit-shop-name').value.trim();
+            let price = parseInt(document.getElementById('edit-shop-price').value);
+            if(!name || isNaN(price)) return Swal.showValidationMessage('กรุณากรอกชื่อและราคาให้ครบถ้วน');
+            return { name: name, price: price, desc: document.getElementById('edit-shop-desc').value.trim() };
+        }
+    }).then(res => {
+        if(res.isConfirmed) {
+            // อัปเดตข้อมูลทับของเดิม
+            appSettings.shopItems[idx].name = res.value.name;
+            appSettings.shopItems[idx].price = res.value.price;
+            appSettings.shopItems[idx].desc = res.value.desc;
+            
+            saveToLocal(true); renderShopAdmin(); // เซฟและโหลดหน้าใหม่
+            Swal.fire({toast:true, position:'top-end', icon:'success', title:'บันทึกการแก้ไขแล้ว', showConfirmButton:false, timer:1500});
+        }
+    });
+}
+
+// ================= อัปโหลดสลิปยอดฝากโดยแอดมิน (ค้นหาได้ + ปุ่มไฟล์แบบกำหนดเอง) =================
+function openAdminDepositUpload() {
+    // สร้าง Option สำหรับ datalist (รวมรหัสและชื่อไว้ด้วยกันให้ค้นหาง่าย)
+    let stuOptions = students.map(s => `<option value="${s.id} - ${s.name} (ห้อง ${s.room})"></option>`).join('');
+    
+    Swal.fire({
+        showCloseButton: true,
+        showConfirmButton: false,
+        html: `
+            <div class="text-left px-2 py-4 font-sans">
+                
+                <div class="flex items-center justify-center mb-6">
+                    <div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mr-3 shadow-inner"><i class="fas fa-file-invoice-dollar text-xl"></i></div>
+                    <h2 class="text-2xl font-bold text-slate-700 tracking-tight">บันทึกยอดฝาก (อัปโหลดสลิป)</h2>
+                </div>
+
+                <div class="space-y-4">
+                    
+                    <!-- 1. ค้นหานักศึกษา (พิมพ์ได้/เลือกได้) -->
+                    <div>
+                        <label class="text-sm font-bold text-slate-500 mb-1.5 block">เลือกนักศึกษา (พิมพ์ชื่อ หรือ รหัส)</label>
+                        <input list="dep-stu-list" id="dep-stu-input" class="w-full bg-white border-2 border-slate-200 text-slate-700 font-bold text-base py-3 px-4 rounded-xl focus:outline-none focus:border-indigo-400 transition-all shadow-sm placeholder-slate-400" placeholder="-- ค้นหาหรือเลือกนักศึกษา --">
+                        <datalist id="dep-stu-list">
+                            ${stuOptions}
+                        </datalist>
+                    </div>
+                    
+                    <!-- 2. จำนวนเงิน -->
+                    <div>
+                        <label class="text-sm font-bold text-slate-500 mb-1.5 block">จำนวนเงินที่ฝาก (บาท)</label>
+                        <input type="number" id="dep-amt" class="w-full bg-white border-2 border-slate-200 text-slate-700 font-bold text-base py-3 px-4 rounded-xl focus:outline-none focus:border-indigo-400 transition-all shadow-sm placeholder-slate-400" placeholder="เช่น 50">
+                    </div>
+                    
+                    <!-- 3. แนบสลิป (ปุ่ม Custom สวยงาม) -->
+                    <div>
+                        <label class="text-sm font-bold text-slate-500 mb-1.5 block">แนบสลิป</label>
+                        <div class="relative w-full">
+                            <!-- ซ่อนปุ่ม input ของเบราว์เซอร์ทิ้งไป -->
+                            <input type="file" id="dep-file" class="hidden" accept="image/*">
+                            
+                            <!-- สร้างหน้าตาปุ่มขึ้นมาใหม่แทน -->
+                            <label for="dep-file" class="flex items-center w-full bg-white border-2 border-slate-200 rounded-xl px-2 py-1.5 shadow-sm transition-all cursor-pointer hover:border-indigo-300">
+                                <span class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-sm px-4 py-2 rounded-lg mr-3 transition-colors">เลือกไฟล์</span>
+                                <span id="dep-file-text" class="text-slate-500 text-sm truncate">ไม่ได้เลือกไฟล์ใด</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- กลุ่มปุ่ม Submit -->
+                <div class="flex justify-center gap-3 mt-8">
+                    <button id="btn-upload-submit" class="bg-[#10b981] hover:bg-[#059669] text-white font-bold py-2.5 px-6 rounded-lg shadow-sm transition-all text-base min-w-[140px]">
+                        อัปโหลดและบันทึก
+                    </button>
+                    <button onclick="Swal.close()" class="bg-[#71717a] hover:bg-[#52525b] text-white font-bold py-2.5 px-6 rounded-lg shadow-sm transition-all text-base min-w-[100px]">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        `,
+        didOpen: () => {
+            // โลจิกเปลี่ยนชื่อไฟล์ตอนกดเลือกรูปภาพ
+            document.getElementById('dep-file').addEventListener('change', function() {
+                let textSpan = document.getElementById('dep-file-text');
+                if(this.files && this.files.length > 0) {
+                    textSpan.innerText = this.files[0].name;
+                    textSpan.classList.replace('text-slate-500', 'text-slate-800');
+                } else {
+                    textSpan.innerText = 'ไม่ได้เลือกไฟล์ใด';
+                    textSpan.classList.replace('text-slate-800', 'text-slate-500');
+                }
+            });
+
+            // โลจิกปุ่มอัปโหลด
+            document.getElementById('btn-upload-submit').addEventListener('click', () => {
+                let stuInputVal = document.getElementById('dep-stu-input').value;
+                let amt = parseFloat(document.getElementById('dep-amt').value);
+                let fileInput = document.getElementById('dep-file');
+                
+                // ดึงรหัสนักศึกษาออกมาจากข้อความที่พิมพ์ (ตัดคำว่า " - ")
+                let stuId = stuInputVal.split(' - ')[0]; 
+                let stu = students.find(s => s.id === stuId);
+
+                if(!stu) {
+                    Swal.showValidationMessage('ไม่พบข้อมูลนักศึกษา กรุณาพิมพ์หรือเลือกจากรายชื่อให้ถูกต้อง');
+                    return;
+                }
+                if(isNaN(amt) || amt <= 0 || fileInput.files.length === 0) {
+                    Swal.showValidationMessage('กรุณากรอกจำนวนเงินและแนบสลิปให้ครบถ้วน');
+                    return;
+                }
+                
+                let file = fileInput.files[0];
+                
+                Swal.fire({title: 'กำลังอัปโหลดสลิป...', html: 'กรุณารอสักครู่ ระบบกำลังนำสลิปเข้าโฟลเดอร์', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
+                
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    let payload = {
+                        studentId: stu.id, studentName: stu.name, room: stu.room,
+                        base64: e.target.result, mimeType: file.type, fileName: file.name
+                    };
+                    
+                    callBackend({ action: 'adminSaveDepositSlip', data: payload }).then(response => {
+                        if (response && response.success) {
+                            stu.dep = (stu.dep || 0) + amt;
+                            // จำลิงก์สลิปที่อัปโหลดสำเร็จ
+                            stu.lastDepositSlip = response.url || '';
+                            txHistory.unshift({ date: getNow(), name: `ฝากเงินเข้ากองกลาง (แนบสลิปโดยแอดมิน)`, type: 'ฝาก', amt: amt, user: currentUsername });
+                            saveToLocal(true);
+                            refreshAll();
+                            Swal.fire({icon: 'success', title: 'บันทึกสำเร็จ!', text: `เพิ่มเงินฝากให้ ${stu.name} เรียบร้อยแล้ว`});
+                        } else {
+                            const message = response && (response.error || response.message) ? (response.error || response.message) : 'ไม่ทราบสาเหตุ';
+                            Swal.fire('ข้อผิดพลาด', 'ไม่สามารถอัปโหลดได้: ' + message, 'error');
+                        }
+                    }).catch(error => {
+                        Swal.fire('ข้อผิดพลาด', 'ไม่สามารถอัปโหลดได้: ' + (error && error.message ? error.message : error), 'error');
+                    });
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+    });
+}
+
+// ================= หน้าต่างสรุปการเงินรายบุคคล (สำหรับแอดมิน) =================
+function viewStudentFinance(studentId) {
+    let stu = students.find(s => s.id === studentId);
+    if(!stu) return;
+
+    // 1. ดึงประวัติบิลทั้งหมดของนักศึกษาคนนี้
+    let billHtml = '';
+    
+    // เรียงบิลจากใหม่ไปเก่า
+    let sortedRounds = [...fundRounds].sort((a, b) => new Date(b.dueDate || 0) - new Date(a.dueDate || 0));
+    
+    sortedRounds.forEach(r => {
+        let p = fundPayments.find(x => x.roundId === r.id && x.studentId === studentId);
+        if(p) {
+            let isPaid = p.status.includes('จ่ายแล้ว');
+            let statusColor = isPaid ? 'text-emerald-700 bg-emerald-50 border-emerald-200' : 'text-rose-700 bg-rose-50 border-rose-200';
+            let icon = isPaid ? '<i class="fas fa-check-circle text-emerald-500 mr-1"></i>' : '<i class="fas fa-times-circle text-rose-500 mr-1"></i>';
+            let remainText = isPaid ? 'ครบ' : `ค้าง ฿${(r.amt - (p.paidAmt || 0)).toFixed(2)}`;
+            
+            billHtml += `
+            <div class="flex justify-between items-center p-2.5 border-b ${statusColor} rounded-xl mb-2 border shadow-sm">
+                <div class="flex flex-col text-left">
+                    <span class="font-bold text-sm">${icon} ${r.title}</span>
+                    <span class="text-[10px] opacity-70 ml-5">สถานะ: ${p.status}</span>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs font-black">${remainText}</span>
+                    <div class="text-[10px] opacity-70">(จ่ายแล้ว ฿${p.paidAmt || 0})</div>
+                </div>
+            </div>`;
+        }
+    });
+
+    if(!billHtml) billHtml = '<p class="text-slate-400 text-sm text-center py-4">ยังไม่มีรายการบิลเรียกเก็บ</p>';
+
+    // 2. เด้งหน้าต่างสรุปข้อมูล
+    Swal.fire({
+        showCloseButton: true,
+        showConfirmButton: false,
+        html: `
+            <div class="text-left font-sans px-2 py-4">
+                <div class="flex items-center gap-3 border-b pb-3 mb-4">
+                    <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xl shadow-inner">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-black text-lg text-slate-800 leading-tight">${stu.name}</h3>
+                        <p class="text-xs font-bold text-slate-500">รหัส: ${stu.id} | ห้อง ${stu.room}</p>
+                    </div>
+                </div>
+
+                <!-- กระเป๋าเงิน / แต้ม -->
+                <div class="flex gap-2 mb-5">
+                    <div class="flex-1 bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200 p-3 rounded-2xl text-center shadow-sm">
+                        <p class="text-[10px] font-bold text-emerald-600 mb-1 uppercase tracking-wide">เงินฝากกองกลาง</p>
+                        <p class="text-2xl font-black text-emerald-500">฿${(stu.dep || 0).toFixed(2)}</p>
+                    </div>
+                    <div class="flex-1 bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 p-3 rounded-2xl text-center shadow-sm">
+                        <p class="text-[10px] font-bold text-amber-600 mb-1 uppercase tracking-wide">คะแนนสะสม</p>
+                        <p class="text-2xl font-black text-amber-500">${stu.points || 0} <span class="text-sm">✨</span></p>
+                    </div>
+                </div>
+
+                <h4 class="font-bold text-sm text-slate-700 mb-3 flex items-center"><i class="fas fa-history text-indigo-400 mr-2"></i> ประวัติบิลทั้งหมดของนักศึกษา</h4>
+                <div class="max-h-60 overflow-y-auto pr-1 custom-scrollbar">
+                    ${billHtml}
+                </div>
+            </div>
+        `
+    });
+}
+
+// ================= ฟังก์ชันนำเงินฝากมาตัดจ่ายบิลใหม่ =================
+function payWithDeposit(studentId, roundId) {
+    let stu = students.find(s => s.id == studentId);
+    let round = fundRounds.find(r => r.id == roundId);
+    let p = fundPayments.find(x => x.roundId == roundId && x.studentId == studentId);
+    
+    if(!stu || !round || !p || !stu.dep || stu.dep <= 0) return;
+    
+    let remain = round.amt - (p.paidAmt || 0);
+    
+    Swal.fire({
+        title: 'ใช้เงินฝากจ่ายบิลนี้?',
+        html: `
+            <div class="text-left bg-slate-50 p-4 rounded-xl border border-slate-200">
+                <p class="text-sm mb-2 text-slate-600">เงินฝากที่มี: <b class="text-emerald-600">฿${stu.dep}</b></p>
+                <p class="text-sm mb-2 text-slate-600">บิลนี้เรียกเก็บ: <b class="text-rose-600">฿${remain}</b></p>
+                <hr class="my-2 border-slate-200">
+                <p class="text-[10px] text-amber-600">* ระบบจะดึงสลิปเงินฝากเดิมมาแนบเป็นหลักฐานในบิลนี้ให้อัตโนมัติ</p>
+            </div>
+        `,
+        icon: 'question', showCancelButton: true, confirmButtonText: 'ยืนยันหักเงินฝาก', confirmButtonColor: '#10b981'
+    }).then(res => {
+        if(res.isConfirmed) {
+            let useAmt = Math.min(stu.dep, remain);
+            stu.dep -= useAmt; // หักเงินออกจากยอดฝาก
+            
+            p.paidAmt = (p.paidAmt || 0) + useAmt;
+            p.status = p.paidAmt >= round.amt ? 'จ่ายแล้ว (หักเงินฝาก)' : 'ค้างชำระ (หักเงินฝาก)';
+            p.paidDate = getNow();
+            p.paidBy = currentUsername || 'ระบบ (ตัดเงินฝาก)';
+            
+            // 🌟 พระเอกอยู่ตรงนี้: ดึงสลิปเงินฝากเดิมมาใส่ในบิลนี้!
+            if(stu.lastDepositSlip) {
+                p.slipUrl = stu.lastDepositSlip;
+            }
+            
+            // แจกแต้ม
+            let payPoints = (appSettings.ptsConfig && appSettings.ptsConfig.pay !== undefined) ? parseInt(appSettings.ptsConfig.pay) : 10;
+            if(p.status.includes('จ่ายแล้ว') && payPoints > 0) {
+                stu.points = (stu.points || 0) + payPoints;
+                txHistory.unshift({ date: getNow(), name: `+${payPoints} แต้ม (ชำระเงินครบ)`, type: 'ระบบ', amt: 0, user: 'ระบบ' });
+            }
+            
+            txHistory.unshift({ date: getNow(), name: `นำเงินฝากจ่ายบิล "${round.title}"`, type: 'ระบบ', amt: useAmt, user: currentUsername });
+            
+            saveToLocal(true); renderFundTable();
+            Swal.fire({toast:true, position:'top-end', icon:'success', title:'ตัดเงินฝากเรียบร้อย!', showConfirmButton:false, timer:1500});
+        }
+    });
+}
+
+// ================= โหลดรายชื่อนักศึกษา (หน้าจัดการแอดมิน) =================
+window.renderAdminStudentList = function() {
+    let search = (document.getElementById('admin-search-stu')?.value || '').toLowerCase();
+    let roomFilter = document.getElementById('admin-filter-room')?.value || 'all';
+    let tbody = document.getElementById('admin-student-list-body');
+    if(!tbody) return;
+
+    let roomSelect = document.getElementById('admin-filter-room');
+    if (roomSelect && roomSelect.options.length <= 1) {
+        let allRooms = [...new Set(students.map(s => s.room || 'ไม่ระบุห้อง'))].sort();
+        allRooms.forEach(r => roomSelect.innerHTML += `<option value="${r}">ห้อง ${r}</option>`);
+    }
+
+    let html = '';
+    let filteredStu = students.filter(s => {
+        let matchRoom = roomFilter === 'all' || s.room === roomFilter;
+        let matchSearch = search === '' || s.name.toLowerCase().includes(search) || s.id.includes(search);
+        return matchRoom && matchSearch;
+    });
+
+    if (filteredStu.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400 font-bold">ไม่พบรายชื่อนักศึกษา</td></tr>';
+        return;
+    }
+
+    filteredStu.forEach(s => {
+        let depHtml = s.dep > 0 
+            ? `<span class="text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-100"><i class="fas fa-wallet mr-1"></i>฿${(s.dep).toFixed(2)}</span>` 
+            : `<span class="text-slate-300">-</span>`;
+
+        html += `
+        <tr class="border-b border-slate-50 hover:bg-indigo-50/30 transition-colors">
+            <td class="p-4">
+                <div class="font-bold text-slate-700 text-sm cursor-pointer hover:text-indigo-600 transition flex items-center group" onclick="viewStudentFinance('${s.id}')">
+                    ${s.name} <i class="fas fa-search text-[10px] text-slate-300 ml-2 group-hover:text-indigo-400 transition-colors"></i>
+                </div>
+                <div class="text-[10px] text-slate-400 font-mono mt-0.5">${s.id}</div>
+            </td>
+            <td class="p-4 text-center text-xs font-bold text-slate-600">${s.room || '-'}</td>
+            <td class="p-4 text-right text-xs font-black">${depHtml}</td>
+            <td class="p-4 text-center"><span class="font-black text-amber-500 text-sm">${s.points || 0} <i class="fas fa-star text-xs"></i></span></td>
+            <td class="p-4 text-center">
+                <button onclick="manageStudentPoints('${s.id}')" class="bg-amber-100 hover:bg-amber-200 border border-amber-200 text-amber-700 px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm transition">
+                    <i class="fas fa-gift mr-1"></i> ให้แต้ม
+                </button>
+            </td>
+        </tr>`;
+    });
+    tbody.innerHTML = html;
+}
+
+// ================= ระบบจัดการคะแนน (เพิ่ม/ลดแต้ม) =================
+window.manageStudentPoints = function(studentId) {
+    let stu = students.find(s => s.id === studentId);
+    if(!stu) return;
+
+    Swal.fire({
+        title: 'จัดการคะแนนสะสม',
+        html: `
+            <div class="text-left font-sans bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                <div class="flex items-center gap-3 mb-4 border-b border-slate-200 pb-3">
+                    <div class="w-10 h-10 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center text-lg shadow-inner"><i class="fas fa-star"></i></div>
+                    <div>
+                        <p class="font-bold text-slate-800 text-sm">${stu.name}</p>
+                        <p class="text-xs text-slate-500">แต้มปัจจุบัน: <strong class="text-amber-500">${stu.points || 0}</strong> แต้ม</p>
+                    </div>
+                </div>
+                <label class="block text-xs font-bold text-slate-700 mb-1.5">คะแนน (ใส่ติดลบเพื่อหัก)</label>
+                <input type="number" id="pts-val" class="modern-input text-center text-amber-600 text-lg" placeholder="เช่น 10">
+                <label class="block text-xs font-bold text-slate-700 mb-1.5 mt-2">หมายเหตุ</label>
+                <input type="text" id="pts-note" class="modern-input text-sm" placeholder="เช่น ช่วยงานครู">
+            </div>
+        `,
+        showCancelButton: true, confirmButtonText: 'บันทึก', confirmButtonColor: '#f59e0b',
+        preConfirm: () => {
+            let pts = parseInt(document.getElementById('pts-val').value);
+            let note = document.getElementById('pts-note').value || 'แอดมินมอบคะแนนพิเศษ';
+            if(isNaN(pts) || pts === 0) return Swal.showValidationMessage('กรุณาระบุคะแนน');
+            return { pts, note };
+        }
+    }).then(res => {
+        if(res.isConfirmed) {
+            let { pts, note } = res.value;
+            stu.points = (stu.points || 0) + pts;
+            txHistory.unshift({ date: getNow(), name: `${pts>0?'+':''}${pts} แต้ม (${note})`, type: 'ระบบ', amt: 0, user: currentUsername });
+            saveToLocal(true); renderAdminStudentList();
+            Swal.fire({toast:true, position:'top-end', icon:'success', title:'อัปเดตคะแนนเรียบร้อย', showConfirmButton:false, timer:1500});
+        }
+    });
+}
     </script>
 
    <!-- ================= Modal E-Receipt (Minimalist Glow Style) ================= -->
