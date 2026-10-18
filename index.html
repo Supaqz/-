@@ -1399,6 +1399,12 @@ function switchPage(pageId) {
         function applyRoleUI() { 
     const role = currentUserRole; // leader, vice, treasurer, guest
     const isGuest = (role === 'guest');
+
+    // หลังล็อกอินแอดมินสำเร็จ ให้เปิดส่วนเว็บที่ถูกล็อกไว้และเอาหน้าล็อกอินออกก่อนเปลี่ยนหน้า
+    if (!isGuest) {
+        setLoginGateIsolation(false);
+        document.getElementById('sssfn-login-gate')?.remove();
+    }
     
     // ตั้งค่าแสดงเมนูหลัก
     let elSysAct = document.getElementById('system-actions'); 
@@ -1780,6 +1786,46 @@ function handleProfileClick() {
     }
 }
 
+// ป้องกันไม่ให้คลิกหรือเปิดหน้าการเงิน/ประวัติบิลจากด้านหลังหน้าล็อกอิน
+function setLoginGateIsolation(active, loginGate = document.getElementById('sssfn-login-gate')) {
+    if (active) {
+        Array.from(document.body.children).forEach(el => {
+            if (el === loginGate || el.tagName === 'SCRIPT' || el.tagName === 'STYLE') return;
+            if (el.dataset.sssfnLoginIsolated !== '1') {
+                el.dataset.sssfnLoginIsolated = '1';
+                el.dataset.sssfnLoginOldDisplay = el.style.getPropertyValue('display');
+                el.dataset.sssfnLoginOldDisplayPriority = el.style.getPropertyPriority('display');
+                el.dataset.sssfnLoginOldAriaHidden = el.hasAttribute('aria-hidden') ? el.getAttribute('aria-hidden') : '__SSSFN_NONE__';
+                el.dataset.sssfnLoginOldInert = el.hasAttribute('inert') ? '1' : '0';
+            }
+            el.style.setProperty('display', 'none', 'important');
+            el.setAttribute('inert', '');
+            el.setAttribute('aria-hidden', 'true');
+        });
+        return;
+    }
+
+    document.querySelectorAll('[data-sssfn-login-isolated="1"]').forEach(el => {
+        const oldDisplay = el.dataset.sssfnLoginOldDisplay || '';
+        const oldPriority = el.dataset.sssfnLoginOldDisplayPriority || '';
+        if (oldDisplay) el.style.setProperty('display', oldDisplay, oldPriority);
+        else el.style.removeProperty('display');
+
+        if (el.dataset.sssfnLoginOldInert === '1') el.setAttribute('inert', '');
+        else el.removeAttribute('inert');
+
+        const oldAria = el.dataset.sssfnLoginOldAriaHidden;
+        if (oldAria === '__SSSFN_NONE__' || oldAria === undefined) el.removeAttribute('aria-hidden');
+        else el.setAttribute('aria-hidden', oldAria);
+
+        delete el.dataset.sssfnLoginIsolated;
+        delete el.dataset.sssfnLoginOldDisplay;
+        delete el.dataset.sssfnLoginOldDisplayPriority;
+        delete el.dataset.sssfnLoginOldAriaHidden;
+        delete el.dataset.sssfnLoginOldInert;
+    });
+}
+
 function renderHomeDirectory() {
     let roomFilterEl = document.getElementById('home-room-filter');
     let searchEl = document.getElementById('home-search'); 
@@ -1787,6 +1833,12 @@ function renderHomeDirectory() {
     if(!grid || !empty) return;
 
     const isGuest = (currentUserRole === 'guest');
+
+    // หากเข้าสู่ระบบแล้ว ให้คืนการแสดงผลของหน้าเว็บและเอาหน้าล็อกอินออก
+    if (!(isGuest && !window.currentGuestStuId)) {
+        setLoginGateIsolation(false);
+        document.getElementById('sssfn-login-gate')?.remove();
+    }
 
     let titleContainer = document.getElementById('home-title-container');
     let fundCard = document.getElementById('home-bal-pool-fund')?.closest('.playful-card') || document.getElementById('home-bal-pool-fund')?.closest('.bg-white');
@@ -1820,12 +1872,27 @@ function renderHomeDirectory() {
             document.getElementById('footer-credit-login')?.classList.remove('hidden');
             document.getElementById('footer-credit-main')?.classList.add('hidden');
 
-            grid.className = "block w-full h-full flex items-center justify-center"; 
-            grid.innerHTML = ''; 
-            empty.classList.remove('hidden');
-            
+            // เตรียมพื้นที่ด้านหลังไว้ แต่ซ่อนกล่อง empty เดิม เพราะมันอยู่กลางหน้า Home
+            grid.className = "block w-full h-full flex items-center justify-center";
+            grid.innerHTML = '';
+            empty.classList.add('hidden');
+
+            // สร้างหน้าล็อกอินแบบเต็มจอ แยกจากเนื้อหาจัดการการเงิน
+            let loginGate = document.getElementById('sssfn-login-gate');
+            if (!loginGate) {
+                loginGate = document.createElement('div');
+                loginGate.id = 'sssfn-login-gate';
+                loginGate.className = 'fixed inset-0 z-[9999] flex items-center justify-center bg-[#222222] p-4 overflow-y-auto';
+                // กำหนดด้วย inline style อีกชั้น เพื่อให้เต็มหน้าจอแน่นอนแม้ CSS utility จะไม่ถูก build
+                loginGate.style.cssText = 'position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:#222222;padding:1rem;overflow-y:auto;';
+                document.body.appendChild(loginGate);
+            }
+
+            // ซ่อนและปิดการโต้ตอบกับทุกส่วนของเว็บด้านหลัง รวมถึงตารางการเงินและปุ่มประวัติบิล
+            setLoginGateIsolation(true, loginGate);
+
             // สร้าง Layout กล่องล็อกอิน
-            empty.innerHTML = `
+            loginGate.innerHTML = `
             <div class="w-full h-full flex items-center justify-center p-4 relative">
                 <div class="w-full max-w-3xl bg-white rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row h-auto md:h-[440px] relative z-10 my-auto">
                     
